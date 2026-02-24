@@ -443,7 +443,31 @@
                 const y = this.state.year.toString();
                 if(!this.state.db[y]) {
                     this.state.db[y] = Array(12).fill(null).map(() => ({
-                        income: [], expenses: [], assets: [], invest: []
+                        income: [
+                            { name: 'Gehalt', val: 0, recurring: true },
+                            { name: 'Nebenjob', val: 0, recurring: true },
+                            { name: 'Sonstiges', val: 0, recurring: true },
+                            { name: 'Zinsen', val: 0, recurring: true }
+                        ],
+                        expenses: [
+                            { name: 'Haus', val: 0, recurring: true },
+                            { name: 'Fixkosten', val: 0, recurring: true },
+                            { name: 'Sonstiges', val: 0, recurring: true }
+                        ],
+                        invest: [
+                            { name: 'ETF', val: 0, recurring: true },
+                            { name: 'Aktien', val: 0, recurring: true },
+                            { name: 'Krypto', val: 0, recurring: true },
+                            { name: 'Sparen', val: 0, recurring: true }
+                        ],
+                        assets: [
+                            { name: 'Cash', val: 0, recurring: true },
+                            { name: 'ETF', val: 0, recurring: true },
+                            { name: 'Aktien', val: 0, recurring: true },
+                            { name: 'Krypto', val: 0, recurring: true },
+                            { name: 'Tresor', val: 0, recurring: true },
+                            { name: 'Sonstiges', val: 0, recurring: true }
+                        ]
                     }));
                 }
             },
