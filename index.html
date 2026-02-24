@@ -10,20 +10,20 @@
     <style>
         :root {
             --bg-page: #f8fafc;
-            --bg-card: rgba(255, 255, 255, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.85);
             --text-main: #020617;
             --accent: #2563eb;
             --accent-glow: rgba(37, 99, 235, 0.4);
-            --border: rgba(0, 0, 0, 0.05);
+            --border: rgba(0, 0, 0, 0.08);
         }
 
         .dark {
             --bg-page: #020617;
-            --bg-card: rgba(15, 23, 42, 0.7);
+            --bg-card: rgba(15, 23, 42, 0.8);
             --text-main: #f8fafc;
             --accent: #3b82f6;
             --accent-glow: rgba(59, 130, 246, 0.3);
-            --border: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.12);
         }
 
         body {
@@ -31,295 +31,265 @@
             background-color: var(--bg-page);
             color: var(--text-main);
             transition: background-color 0.3s ease;
+            overflow-x: hidden;
         }
 
-        /* Liquid Glass Effect */
         .liquid-glass {
             background-color: var(--bg-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid var(--border);
-            border-radius: 1rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
         }
 
         .header-solid {
             background-color: var(--bg-page);
-            border-bottom: 4px solid var(--accent);
+            border-bottom: 3px solid var(--accent);
             z-index: 100;
         }
 
         input, select {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-            border: 2px solid var(--border) !important;
+            background-color: rgba(0, 0, 0, 0.03) !important;
+            border: 1px solid var(--border) !important;
             color: var(--text-main) !important;
-            font-weight: 800 !important;
-            border-radius: 0.5rem;
+            font-weight: 700 !important;
+            border-radius: 0.6rem;
             padding: 0.5rem 0.8rem;
+        }
+
+        .dark input, .dark select {
+            background-color: rgba(255, 255, 255, 0.05) !important;
         }
 
         input:focus {
             border-color: var(--accent) !important;
             outline: none;
-        }
-
-        .btn-action {
-            background-color: var(--accent);
-            color: white;
-            font-weight: 900;
-            text-transform: uppercase;
-            padding: 0.6rem 1.2rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 14px 0 var(--accent-glow);
+            box-shadow: 0 0 0 3px var(--accent-glow);
         }
 
         /* Breathing Animations */
         @keyframes liquid-breathe {
-            0%, 100% { border-color: var(--border); box-shadow: 0 0 0px var(--accent-glow); }
-            50% { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+            0%, 100% { border-color: var(--border); box-shadow: 0 0 5px transparent; }
+            50% { border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); }
         }
 
         .breathe {
-            animation: liquid-breathe 5s ease-in-out infinite;
-        }
-
-        .loading-dots:after {
-            content: '.';
-            animation: dots 1.5s steps(5, end) infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60% { content: '...'; }
-            80%, 100% { content: ''; }
+            animation: liquid-breathe 6s ease-in-out infinite;
         }
 
         .collapse-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .collapse-content.open {
-            max-height: 2500px;
+            max-height: 2000px;
         }
         .chevron { transition: transform 0.3s ease; }
         .chevron.rotated { transform: rotate(180deg); }
 
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
         canvas {
-            filter: drop-shadow(0 0 10px var(--accent-glow));
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.05));
         }
     </style>
 </head>
 <body class="light">
 
     <!-- Navigation -->
-    <nav id="nav-main" class="header-solid p-4 md:p-6 sticky top-0">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <nav id="nav-main" class="header-solid p-4 md:px-8 sticky top-0 backdrop-blur-md bg-opacity-80">
+        <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4">
-                <div class="bg-black text-white dark:bg-white dark:text-black w-12 h-12 flex items-center justify-center rounded font-black text-2xl shadow-lg">LW</div>
+                <div class="bg-black text-white dark:bg-white dark:text-black w-10 h-10 flex items-center justify-center rounded-xl font-black text-xl shadow-xl">LW</div>
                 <div>
-                    <h1 class="text-3xl font-black tracking-tighter uppercase leading-none">Liquid Wealth</h1>
-                    <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1">Tactical Elite Command</p>
+                    <h1 class="text-2xl font-black tracking-tighter uppercase leading-none">Liquid Wealth</h1>
+                    <p class="text-[9px] font-bold text-blue-600 uppercase tracking-widest mt-1">Tactical Elite Command</p>
                 </div>
             </div>
             
-            <div class="flex items-center gap-2 bg-slate-200/50 dark:bg-slate-800/50 p-2 rounded-xl border-2 border-slate-300 dark:border-slate-700 backdrop-blur-md">
-                <button onclick="app.showCopyModal()" class="text-[9px] font-black bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition-all">DATEN ÜBERNEHMEN</button>
-                <select id="ui-year" onchange="app.changeDate()" class="text-xs"></select>
-                <select id="ui-month" onchange="app.changeDate()" class="text-sm">
+            <div class="flex items-center gap-2 bg-slate-200/40 dark:bg-slate-800/40 p-1.5 rounded-2xl border border-slate-300/50 dark:border-slate-700/50">
+                <button onclick="app.showSettingsModal()" class="p-2 hover:bg-white/20 rounded-xl transition-all" title="Einstellungen">⚙️</button>
+                <button onclick="app.showCopyModal()" class="text-[9px] font-black bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-xl transition-all shadow-lg shadow-emerald-600/20">DATEN ÜBERNEHMEN</button>
+                <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
+                <select id="ui-year" onchange="app.changeDate()" class="text-xs bg-transparent border-none py-1"></select>
+                <select id="ui-month" onchange="app.changeDate()" class="text-xs bg-transparent border-none py-1 uppercase">
                     <option value="0">JAN</option><option value="1">FEB</option><option value="2">MÄR</option>
                     <option value="3">APR</option><option value="4">MAI</option><option value="5">JUN</option>
                     <option value="6">JUL</option><option value="7">AUG</option><option value="8">SEP</option>
                     <option value="9">OKT</option><option value="10">NOV</option><option value="11">DEZ</option>
                 </select>
-                <button onclick="app.toggleTheme()" class="px-3 py-1 font-black">🌓</button>
+                <button onclick="app.toggleTheme()" class="px-3 py-1 text-lg">🌓</button>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+    <main class="max-w-[1600px] mx-auto p-4 md:p-8 space-y-8">
         
-        <!-- KPIs: Breathing Edition -->
+        <!-- KPIs -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div class="liquid-glass p-4 breathe border-l-4 border-l-blue-600">
+            <div class="liquid-glass p-5 breathe border-l-4 border-l-blue-600">
                 <p class="text-[9px] font-black opacity-60 uppercase tracking-widest">Net Worth</p>
-                <h2 id="kpi-wealth" class="text-xl font-black tabular-nums">0 €</h2>
-                <p id="kpi-btc" class="text-[8px] font-bold text-orange-500 mt-1">₿ 0 BTC</p>
+                <h2 id="kpi-wealth" class="text-2xl font-black tabular-nums">0 €</h2>
+                <p id="kpi-btc" class="text-[9px] font-bold text-orange-500 mt-1">₿ 0 BTC</p>
             </div>
-            <div class="liquid-glass p-4 border-l-4 border-l-emerald-600">
-                <p class="text-[9px] font-black opacity-60 uppercase tracking-widest">Cashflow</p>
-                <h2 id="kpi-cashflow" class="text-xl font-black tabular-nums">0 €</h2>
-                <div id="kpi-savings-rate" class="text-[9px] font-bold text-emerald-500 mt-1 uppercase">Rate: 0%</div>
+            <div class="liquid-glass p-5 border-l-4 border-l-emerald-600">
+                <p class="text-[9px] font-black opacity-60 uppercase tracking-widest text-emerald-600">Cashflow</p>
+                <h2 id="kpi-cashflow" class="text-2xl font-black tabular-nums">0 €</h2>
+                <div id="kpi-savings-rate" class="text-[10px] font-bold text-emerald-500 mt-1 uppercase">Invest-Quote: 0%</div>
             </div>
-            <div class="liquid-glass p-4 border-l-4 border-l-purple-600">
+            <div class="liquid-glass p-5 border-l-4 border-l-blue-400">
                 <p class="text-[9px] font-black opacity-60 uppercase tracking-widest">Restbudget</p>
-                <h2 id="kpi-remaining" class="text-xl font-black tabular-nums">0 €</h2>
-                <div class="w-full bg-slate-200 dark:bg-slate-800 h-1 mt-2 rounded-full overflow-hidden">
+                <h2 id="kpi-remaining" class="text-2xl font-black tabular-nums">0 €</h2>
+                <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 mt-2 rounded-full overflow-hidden">
                     <div id="savings-progress" class="bg-blue-500 h-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
-            <div class="liquid-glass p-4 border-l-4 border-l-orange-600">
-                <p class="text-[9px] font-black opacity-60 uppercase tracking-widest">Notgroschen</p>
-                <h2 id="kpi-emergency" class="text-xl font-black tabular-nums">0%</h2>
-                <p id="kpi-emergency-months" class="text-[8px] font-bold opacity-40 mt-1 uppercase">0.0 Monate</p>
+            <div class="liquid-glass p-5 border-l-4 border-l-orange-500">
+                <p class="text-[9px] font-black opacity-60 uppercase tracking-widest text-orange-500">Notgroschen</p>
+                <h2 id="kpi-emergency" class="text-2xl font-black tabular-nums">0%</h2>
+                <p id="kpi-emergency-months" class="text-[10px] font-bold opacity-40 mt-1 uppercase">0.0 Monate Puffer</p>
             </div>
-            <div class="liquid-glass p-4 border-l-4 border-l-indigo-600">
+            <div class="liquid-glass p-5 border-l-4 border-l-indigo-600">
                 <p class="text-[9px] font-black opacity-60 uppercase tracking-widest">FIRE Roadmap</p>
-                <h2 id="kpi-fire" class="text-xl font-black tabular-nums">-- J.</h2>
-                <p class="text-[8px] font-bold opacity-40 mt-1 uppercase">Bis Freiheit</p>
+                <h2 id="kpi-fire" class="text-2xl font-black tabular-nums">-- J.</h2>
+                <p id="ui-fire-target-info" class="text-[10px] font-bold opacity-40 mt-1 uppercase">Ziel: 1M €</p>
             </div>
-            <div class="liquid-glass p-4 border-l-4 border-l-slate-600">
+            <div class="liquid-glass p-5 border-l-4 border-l-slate-400">
                 <p class="text-[9px] font-black opacity-60 uppercase tracking-widest">Runway</p>
-                <h2 id="kpi-runway" class="text-xl font-black tabular-nums">0 M.</h2>
-                <p class="text-[8px] font-bold opacity-40 mt-1 uppercase">Sicherheit</p>
+                <h2 id="kpi-runway" class="text-2xl font-black tabular-nums">0 M.</h2>
+                <p class="text-[10px] font-bold opacity-40 mt-1 uppercase">Volle Sicherheit</p>
             </div>
-        </div>
-
-        <!-- AI Assistant -->
-        <div class="liquid-glass p-6 bg-blue-600/5 border-blue-500/20 shadow-lg shadow-blue-500/5">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-                <h3 class="text-xl font-black uppercase flex items-center gap-2">✨ Gemini Strategie-Zentrum</h3>
-                <div class="flex gap-2">
-                    <button onclick="app.askAI('analyze')" class="btn-action text-[9px]">✨ Lage-Check</button>
-                    <button onclick="app.askAI('tips')" class="btn-action bg-emerald-600 text-[9px]">✨ Spar-Tipps</button>
-                </div>
-            </div>
-            <div id="ai-response" class="bg-white/40 dark:bg-black/40 p-4 rounded-lg border-2 border-white/20 text-sm leading-relaxed min-h-[60px] max-h-[150px] overflow-y-auto">Bereit für die Analyse...</div>
         </div>
 
         <!-- Main Workspace -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
             
             <!-- INCOME -->
             <div class="liquid-glass overflow-hidden">
-                <div onclick="app.toggleCollapse('col-income', 'chevron-income')" class="p-4 bg-slate-200/50 dark:bg-slate-800/50 cursor-pointer flex justify-between items-center">
-                    <h3 class="text-sm font-black uppercase">Einnahmen</h3>
+                <div onclick="app.toggleCollapse('col-income', 'chevron-income')" class="p-5 bg-slate-100 dark:bg-slate-800/40 cursor-pointer flex justify-between items-center group">
+                    <h3 class="text-xs font-black uppercase">Einnahmen</h3>
                     <div class="flex items-center gap-3">
-                        <button onclick="event.stopPropagation(); app.add('income')" class="w-6 h-6 bg-black dark:bg-white text-white dark:text-black font-black rounded-lg text-xs hover:scale-110 transition-transform">+</button>
-                        <svg id="chevron-income" class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        <button onclick="event.stopPropagation(); app.add('income')" class="w-7 h-7 bg-black dark:bg-white text-white dark:text-black font-black rounded-lg text-xs hover:scale-110 transition-transform shadow-md">+</button>
+                        <svg id="chevron-income" class="chevron w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
-                <div id="col-income" class="collapse-content open p-4">
-                    <div class="flex flex-wrap gap-1 mb-3">
+                <div id="col-income" class="collapse-content open p-5">
+                    <div class="flex flex-wrap gap-1.5 mb-4">
                         <span class="suggestion-chip" onclick="app.quickAdd('income', 'Gehalt Helios', 3200)">Helios</span>
                         <span class="suggestion-chip" onclick="app.quickAdd('income', 'Testsieger-TV', 450)">Redaktion</span>
                     </div>
-                    <div id="list-income" class="space-y-2"></div>
+                    <div id="list-income" class="space-y-3"></div>
                 </div>
             </div>
 
             <!-- EXPENSES -->
             <div class="liquid-glass overflow-hidden">
-                <div onclick="app.toggleCollapse('col-expenses', 'chevron-expenses')" class="p-4 bg-red-100/50 dark:bg-red-900/20 cursor-pointer flex justify-between items-center">
-                    <h3 class="text-sm font-black uppercase text-red-600">Ausgaben</h3>
+                <div onclick="app.toggleCollapse('col-expenses', 'chevron-expenses')" class="p-5 bg-red-50/50 dark:bg-red-900/10 cursor-pointer flex justify-between items-center group">
+                    <h3 class="text-xs font-black uppercase text-red-600">Ausgaben</h3>
                     <div class="flex items-center gap-3">
-                        <button onclick="event.stopPropagation(); app.add('expenses')" class="w-6 h-6 bg-red-600 text-white font-black rounded-lg text-xs hover:scale-110 transition-transform">+</button>
-                        <svg id="chevron-expenses" class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        <button onclick="event.stopPropagation(); app.add('expenses')" class="w-7 h-7 bg-red-600 text-white font-black rounded-lg text-xs hover:scale-110 transition-transform shadow-md">+</button>
+                        <svg id="chevron-expenses" class="chevron w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
-                <div id="col-expenses" class="collapse-content open p-4">
-                    <div class="flex flex-wrap gap-1 mb-3">
+                <div id="col-expenses" class="collapse-content open p-5">
+                    <div class="flex flex-wrap gap-1.5 mb-4">
                         <span class="suggestion-chip" onclick="app.quickAdd('expenses', 'Miete', 900)">Miete</span>
-                        <span class="suggestion-chip" onclick="app.quickAdd('expenses', 'Versicherungen', 150)">Versicherung</span>
+                        <span class="suggestion-chip" onclick="app.quickAdd('expenses', 'Essen', 400)">Food</span>
                     </div>
-                    <div id="list-expenses" class="space-y-2"></div>
+                    <div id="list-expenses" class="space-y-3"></div>
                 </div>
             </div>
 
             <!-- INVESTMENTS -->
             <div class="liquid-glass overflow-hidden">
-                <div onclick="app.toggleCollapse('col-invest', 'chevron-invest')" class="p-4 bg-emerald-100/50 dark:bg-emerald-900/20 cursor-pointer flex justify-between items-center">
-                    <h3 class="text-sm font-black uppercase text-emerald-600">Investments</h3>
+                <div onclick="app.toggleCollapse('col-invest', 'chevron-invest')" class="p-5 bg-emerald-50/50 dark:bg-emerald-900/10 cursor-pointer flex justify-between items-center group">
+                    <h3 class="text-xs font-black uppercase text-emerald-600">Investments</h3>
                     <div class="flex items-center gap-3">
-                        <button onclick="event.stopPropagation(); app.add('invest')" class="w-6 h-6 bg-emerald-600 text-white font-black rounded-lg text-xs hover:scale-110 transition-transform">+</button>
-                        <svg id="chevron-invest" class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        <button onclick="event.stopPropagation(); app.add('invest')" class="w-7 h-7 bg-emerald-600 text-white font-black rounded-lg text-xs hover:scale-110 transition-transform shadow-md">+</button>
+                        <svg id="chevron-invest" class="chevron w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
-                <div id="col-invest" class="collapse-content open p-4">
-                    <div class="flex flex-wrap gap-1 mb-3">
+                <div id="col-invest" class="collapse-content open p-5">
+                    <div class="flex flex-wrap gap-1.5 mb-4">
                         <span class="suggestion-chip" onclick="app.quickAdd('invest', 'BTC DCA', 500)">Bitcoin</span>
                         <span class="suggestion-chip" onclick="app.quickAdd('invest', 'Welt ETF', 1000)">Welt ETF</span>
                     </div>
-                    <div id="list-invest" class="space-y-2"></div>
+                    <div id="list-invest" class="space-y-3"></div>
                 </div>
             </div>
 
             <!-- ASSETS -->
             <div class="liquid-glass overflow-hidden">
-                <div onclick="app.toggleCollapse('col-assets', 'chevron-assets')" class="p-4 bg-blue-100/50 dark:bg-blue-900/20 cursor-pointer flex justify-between items-center">
-                    <h3 class="text-sm font-black uppercase text-blue-600">Bestand (Assets)</h3>
+                <div onclick="app.toggleCollapse('col-assets', 'chevron-assets')" class="p-5 bg-blue-50/50 dark:bg-blue-900/10 cursor-pointer flex justify-between items-center group">
+                    <h3 class="text-xs font-black uppercase text-blue-600">Assets (Bestand)</h3>
                     <div class="flex items-center gap-3">
-                        <button onclick="event.stopPropagation(); app.add('assets')" class="w-6 h-6 bg-blue-600 text-white font-black rounded-lg text-xs hover:scale-110 transition-transform">+</button>
-                        <svg id="chevron-assets" class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        <button onclick="event.stopPropagation(); app.add('assets')" class="w-7 h-7 bg-blue-600 text-white font-black rounded-lg text-xs hover:scale-110 transition-transform shadow-md">+</button>
+                        <svg id="chevron-assets" class="chevron w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
-                <div id="col-assets" class="collapse-content open p-4">
-                    <div class="flex flex-wrap gap-1 mb-3">
-                        <span class="suggestion-chip" onclick="app.quickAdd('assets', 'Bitcoin Cold', 60000)">Cold BTC</span>
+                <div id="col-assets" class="collapse-content open p-5">
+                    <div class="flex flex-wrap gap-1.5 mb-4">
+                        <span class="suggestion-chip" onclick="app.quickAdd('assets', 'Cold Storage', 60000)">BTC</span>
                         <span class="suggestion-chip" onclick="app.quickAdd('assets', 'Tagesgeld', 5000)">Cash</span>
                     </div>
-                    <div id="list-assets" class="space-y-2"></div>
+                    <div id="list-assets" class="space-y-3"></div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-8 liquid-glass p-6">
-                <h3 class="text-sm font-black uppercase mb-4 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                    Vermögensverlauf
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Graph: Full Performance -->
+            <div class="lg:col-span-2 liquid-glass p-6">
+                <h3 class="text-xs font-black uppercase mb-6 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
+                    Portfolio Performance
                 </h3>
-                <div class="h-[300px]"><canvas id="chart-history"></canvas></div>
+                <div class="h-[350px]"><canvas id="chart-history"></canvas></div>
             </div>
 
-            <div class="lg:col-span-4 space-y-6">
+            <!-- Emergency Fund & Quick Setup -->
+            <div class="lg:col-span-1 space-y-6">
                 <div class="liquid-glass p-6 border-l-4 border-l-orange-500">
-                    <h3 class="text-xs font-black uppercase mb-4">Notgroschen Setup</h3>
+                    <h3 class="text-xs font-black uppercase mb-4 tracking-tighter">Notgroschen Strategie</h3>
                     <div class="space-y-4">
                         <div>
-                            <label class="text-[9px] font-black uppercase opacity-60">Ziel (Monatsausgaben)</label>
+                            <label class="text-[10px] font-black uppercase opacity-60">Ziel-Puffer (Monate)</label>
                             <input type="number" id="cfg-emergency-months" value="3" onchange="app.render()" class="w-full mt-1">
                         </div>
-                        <div class="p-3 bg-white/50 dark:bg-black/50 rounded-lg text-center border-2 border-dashed border-orange-500/20">
-                            <p class="text-[10px] font-bold opacity-60">Benötigter Puffer:</p>
-                            <p id="ui-emergency-target" class="text-lg font-black text-orange-600">0 €</p>
+                        <div class="p-4 bg-orange-500/5 dark:bg-orange-500/10 rounded-2xl text-center border-2 border-dashed border-orange-500/30">
+                            <p class="text-[10px] font-bold opacity-60 uppercase">Benötigtes Kapital:</p>
+                            <p id="ui-emergency-target" class="text-2xl font-black text-orange-600">0 €</p>
                         </div>
+                        <p class="text-[10px] font-medium opacity-50 italic leading-tight text-center px-2">Basierend auf deinen aktuellen monatlichen Ausgaben.</p>
                     </div>
                 </div>
 
-                <div class="liquid-glass p-6">
-                    <h3 class="text-xs font-black uppercase mb-4">Globale Parameter</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-[9px] font-black uppercase opacity-60">BTC Kurs (€)</label>
-                            <input type="number" id="cfg-btc" value="95000" onchange="app.render()" class="w-full mt-1">
-                        </div>
-                        <div>
-                            <label class="text-[9px] font-black uppercase opacity-60">FIRE Ziel (€)</label>
-                            <input type="number" id="cfg-target" value="1000000" onchange="app.render()" class="w-full mt-1">
-                        </div>
-                        <div>
-                            <label class="text-[9px] font-black uppercase opacity-60">Szenario Rendite (%)</label>
-                            <div class="flex items-center gap-4 mt-1">
-                                <input type="range" id="cfg-roi" min="1" max="15" value="7" oninput="app.render()" class="flex-1 accent-blue-600">
-                                <span id="ui-roi" class="font-black text-blue-600 text-sm">7%</span>
-                            </div>
-                        </div>
+                <div class="liquid-glass p-6 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-black uppercase mb-4">Datentresor</h3>
+                        <p class="text-[10px] font-bold opacity-40 mb-6 uppercase">Deine Daten werden nur lokal in deinem Browser gespeichert.</p>
                     </div>
-                    <button onclick="app.export()" class="w-full bg-black text-white dark:bg-white dark:text-black py-3 rounded-lg font-black text-[10px] uppercase mt-6 hover:scale-105 transition-transform">Backup Export</button>
+                    <div class="space-y-3">
+                        <button onclick="app.export()" class="w-full bg-slate-900 text-white dark:bg-white dark:text-black py-4 rounded-xl font-black text-[10px] uppercase hover:scale-105 transition-transform shadow-lg">Backup Export (JSON)</button>
+                        <button onclick="document.getElementById('import-file').click()" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white py-3 rounded-xl font-black text-[10px] uppercase hover:bg-slate-300 dark:hover:bg-slate-700 transition-all">Daten Import</button>
+                        <input type="file" id="import-file" class="hidden" onchange="app.importData(event)">
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- Copy Modal -->
-    <div id="copy-modal" class="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="liquid-glass max-w-sm w-full bg-white/90 dark:bg-slate-900/90 p-8 shadow-2xl">
-            <h3 class="text-lg font-black uppercase mb-4">Daten Übernehmen</h3>
-            <p class="text-xs font-bold mb-6 opacity-60 leading-relaxed">Kopiere Struktur und Werte aus einem anderen Monat.</p>
+    <div id="copy-modal" class="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="liquid-glass max-w-sm w-full bg-white/95 dark:bg-slate-900/95 p-8 shadow-2xl">
+            <h3 class="text-lg font-black uppercase mb-2">Daten Übernehmen</h3>
+            <p class="text-[11px] font-bold mb-6 opacity-60 leading-relaxed">Wähle einen Monat aus, dessen Struktur und Werte du kopieren möchtest.</p>
             <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-3">
                     <select id="copy-year" class="w-full text-xs"></select>
                     <select id="copy-month" class="w-full text-xs">
                         <option value="0">JAN</option><option value="1">FEB</option><option value="2">MÄR</option>
@@ -328,9 +298,36 @@
                         <option value="9">OKT</option><option value="10">NOV</option><option value="11">DEZ</option>
                     </select>
                 </div>
-                <div class="flex gap-2 pt-4">
-                    <button onclick="app.hideCopyModal()" class="flex-1 py-3 font-black uppercase text-[10px] bg-slate-200 dark:bg-slate-800 rounded-lg">Abbruch</button>
-                    <button onclick="app.executeCopy()" class="flex-1 py-3 bg-emerald-600 text-white font-black uppercase text-[10px] rounded-lg shadow-lg shadow-emerald-600/20">Kopieren</button>
+                <div class="flex gap-3 pt-4">
+                    <button onclick="app.hideCopyModal()" class="flex-1 py-3 font-black uppercase text-[10px] bg-slate-200 dark:bg-slate-800 rounded-xl">Abbruch</button>
+                    <button onclick="app.executeCopy()" class="flex-1 py-3 bg-emerald-600 text-white font-black uppercase text-[10px] rounded-xl shadow-lg shadow-emerald-600/20">Bestätigen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="liquid-glass max-w-sm w-full bg-white/95 dark:bg-slate-900/95 p-8 shadow-2xl">
+            <h3 class="text-lg font-black uppercase mb-6">Konfiguration</h3>
+            <div class="space-y-6">
+                <div>
+                    <label class="text-[10px] font-black uppercase opacity-60">Bitcoin Preis (€)</label>
+                    <input type="number" id="cfg-btc" value="95000" onchange="app.render()" class="w-full mt-1 text-lg">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase opacity-60">FIRE Zielsumme (€)</label>
+                    <input type="number" id="cfg-target" value="1000000" onchange="app.render()" class="w-full mt-1 text-lg">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase opacity-60">Rendite-Erwartung (%)</label>
+                    <div class="flex items-center gap-4 mt-2">
+                        <input type="range" id="cfg-roi" min="1" max="15" value="7" oninput="app.render()" class="flex-1 accent-blue-600">
+                        <span id="ui-roi" class="font-black text-blue-600 text-base w-10 text-right">7%</span>
+                    </div>
+                </div>
+                <div class="pt-4">
+                    <button onclick="app.hideSettingsModal()" class="w-full py-4 bg-blue-600 text-white font-black uppercase text-[10px] rounded-xl shadow-lg shadow-blue-600/20">Speichern & Schließen</button>
                 </div>
             </div>
         </div>
@@ -339,7 +336,7 @@
     <script>
         const app = {
             state: {
-                year: 2025,
+                year: new Date().getFullYear(),
                 month: new Date().getMonth(),
                 theme: 'light',
                 db: {}
@@ -347,17 +344,23 @@
             chart: null,
 
             init() {
-                const saved = localStorage.getItem('lw_tactical_v9');
-                if (saved) this.state = JSON.parse(saved);
+                const saved = localStorage.getItem('lw_tactical_v10');
+                if (saved) {
+                    const loaded = JSON.parse(saved);
+                    this.state.db = loaded.db || {};
+                    this.state.theme = loaded.theme || 'light';
+                    // Wir überschreiben year/month NICHT mit dem alten Stand, sondern nutzen immer das aktuelle Datum für den Start
+                }
 
                 const yp = document.getElementById('ui-year');
                 const cy = document.getElementById('copy-year');
+                const currentYear = new Date().getFullYear();
                 for(let i=2024; i<=2035; i++) {
                     [yp, cy].forEach(el => {
                         if(el) {
                             const opt = document.createElement('option');
                             opt.value = i; opt.innerText = i;
-                            if(i === this.state.year) opt.selected = true;
+                            if(i === currentYear) opt.selected = true;
                             el.appendChild(opt);
                         }
                     });
@@ -400,9 +403,9 @@
                     const div = document.createElement('div');
                     div.className = "flex gap-2 items-center group";
                     div.innerHTML = `
-                        <input type="text" value="${item.name}" onchange="app.updateItem('${type}', ${idx}, 'name', this.value)" class="flex-1 text-[10px] p-2 bg-transparent">
-                        <input type="number" value="${item.val}" onchange="app.updateItem('${type}', ${idx}, 'val', this.value)" class="w-16 text-right text-[10px] p-2 bg-transparent">
-                        <button onclick="app.remove('${type}', ${idx})" class="text-red-500 font-bold px-1 opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
+                        <input type="text" value="${item.name}" onchange="app.updateItem('${type}', ${idx}, 'name', this.value)" class="flex-1 text-[11px] p-2 bg-transparent border-none">
+                        <input type="number" value="${item.val}" onchange="app.updateItem('${type}', ${idx}, 'val', this.value)" class="w-20 text-right text-[11px] p-2 bg-transparent border-none font-black">
+                        <button onclick="app.remove('${type}', ${idx})" class="text-red-500 font-bold px-2 opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
                     `;
                     container.appendChild(div);
                 });
@@ -446,7 +449,6 @@
                 const inv = (data.invest || []).reduce((s, i) => s + i.val, 0);
                 const wealth = data.assets.reduce((s, i) => s + i.val, 0);
                 
-                // Cash Find (for Emergency Fund)
                 const cash = data.assets.filter(a => 
                     a.name.toLowerCase().includes('cash') || 
                     a.name.toLowerCase().includes('tagesgeld') || 
@@ -472,17 +474,23 @@
                 const fireProgress = document.getElementById('fire-progress');
                 const uiRoi = document.getElementById('ui-roi');
                 const uiEmergencyTarget = document.getElementById('ui-emergency-target');
+                const uiFireTargetInfo = document.getElementById('ui-fire-target-info');
 
                 if (uiRoi) uiRoi.innerText = roi + '%';
                 if (kpiWealth) kpiWealth.innerText = this.format(wealth);
                 if (kpiBtc) kpiBtc.innerText = `₿ ${(wealth / btcPrice).toFixed(6)} BTC`;
+                if (uiFireTargetInfo) uiFireTargetInfo.innerText = `Ziel: ${this.format(target)}`;
                 
                 // Cashflow (Income - Expenses)
-                if (kpiCashflow) kpiCashflow.innerText = this.format(inc - exp);
+                const cashflow = inc - exp;
+                if (kpiCashflow) {
+                    kpiCashflow.innerText = this.format(cashflow);
+                    kpiCashflow.style.color = cashflow < 0 ? '#ef4444' : '#10b981';
+                }
                 
                 // Savings Rate (Invest / Income)
                 const rate = inc > 0 ? Math.round((inv / inc) * 100) : 0;
-                if (kpiSavingsRate) kpiSavingsRate.innerText = `Rate: ${rate}%`;
+                if (kpiSavingsRate) kpiSavingsRate.innerText = `Invest-Quote: ${rate}%`;
 
                 // Remaining (Income - Expenses - Investments)
                 const remaining = inc - exp - inv;
@@ -490,7 +498,7 @@
                     kpiRemaining.innerText = this.format(remaining);
                     kpiRemaining.style.color = remaining < 0 ? '#ef4444' : (remaining > 0 ? '#10b981' : 'inherit');
                 }
-                if (savingsProgress) savingsProgress.style.width = `${Math.min(Math.abs(rate), 100)}%`;
+                if (savingsProgress) savingsProgress.style.width = `${Math.min(Math.max(0, rate), 100)}%`;
 
                 // Emergency Fund Logic
                 const neededEmergency = exp * emerMonthsTarget;
@@ -498,9 +506,9 @@
                 const emerPercent = neededEmergency > 0 ? Math.round((cash / neededEmergency) * 100) : 0;
                 if (kpiEmergency) {
                     kpiEmergency.innerText = `${emerPercent}%`;
-                    kpiEmergency.parentElement.style.borderLeftColor = emerPercent >= 100 ? '#10b981' : '#f97316';
+                    kpiEmergency.parentElement.style.borderLeftColor = emerPercent >= 100 ? '#10b981' : (emerPercent > 50 ? '#f97316' : '#ef4444');
                 }
-                if (kpiEmergencyMonths) kpiEmergencyMonths.innerText = `${exp > 0 ? (cash / exp).toFixed(1) : 0.0} Monate`;
+                if (kpiEmergencyMonths) kpiEmergencyMonths.innerText = `${exp > 0 ? (cash / exp).toFixed(1) : 0.0} Monate Puffer`;
 
                 // Runway
                 const runway = exp > 0 ? Math.floor(wealth / exp) : 0;
@@ -522,7 +530,8 @@
                         if (kpiFire) kpiFire.innerText = y + " J.";
                     }
                 }
-                if (fireProgress) fireProgress.style.width = Math.min((wealth / target) * 100, 100) + '%';
+                // Small Fire Progress bar logic
+                // if (fireProgress) fireProgress.style.width = Math.min((wealth / target) * 100, 100) + '%';
             },
 
             updateChart() {
@@ -542,12 +551,13 @@
                             data: dataPoints,
                             borderColor: '#2563eb',
                             borderWidth: 5,
-                            tension: 0.3,
+                            tension: 0.35,
                             fill: true,
                             backgroundColor: 'rgba(37, 99, 235, 0.08)',
                             pointRadius: 4,
                             pointBackgroundColor: '#2563eb',
-                            pointBorderColor: 'white'
+                            pointBorderColor: 'white',
+                            pointHoverRadius: 8
                         }]
                     },
                     options: {
@@ -562,14 +572,10 @@
                 });
             },
 
-            showCopyModal() { 
-                const el = document.getElementById('copy-modal');
-                if(el) el.classList.remove('hidden'); 
-            },
-            hideCopyModal() { 
-                const el = document.getElementById('copy-modal');
-                if(el) el.classList.add('hidden'); 
-            },
+            showCopyModal() { document.getElementById('copy-modal').classList.remove('hidden'); },
+            hideCopyModal() { document.getElementById('copy-modal').classList.add('hidden'); },
+            showSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); },
+            hideSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); },
             
             executeCopy() {
                 const sYear = document.getElementById('copy-year').value;
@@ -579,8 +585,6 @@
                     this.state.db[this.state.year][this.state.month] = source;
                     this.render();
                     this.hideCopyModal();
-                } else {
-                    alert("Keine Quelle gefunden!");
                 }
             },
 
@@ -598,57 +602,31 @@
             },
 
             applyTheme() { document.body.className = this.state.theme; },
-            save() { localStorage.setItem('lw_tactical_v9', JSON.stringify(this.state)); },
+            save() { localStorage.setItem('lw_tactical_v10', JSON.stringify(this.state)); },
             export() {
                 const blob = new Blob([JSON.stringify(this.state)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
+                const a = document.createElement('a'); a.href = url;
                 a.download = `lw_tactical_backup_${this.state.year}.json`;
                 a.click();
             },
 
-            format(v) { return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v); },
-
-            async askAI(mode) {
-                const aiDisplay = document.getElementById('ai-response');
-                if(!aiDisplay) return;
-                aiDisplay.innerHTML = '<span class="loading-dots font-bold italic">Scanne Liquidität</span>';
-                const data = this.state.db[this.state.year][this.state.month];
-                const inc = data.income.reduce((s, i) => s + i.val, 0);
-                const exp = data.expenses.reduce((s, i) => s + i.val, 0);
-                const inv = (data.invest || []).reduce((s, i) => s + i.val, 0);
-                const wealth = data.assets.reduce((s, i) => s + i.val, 0);
-                const cash = data.assets.filter(a => a.name.toLowerCase().includes('cash')).reduce((s, i) => s + i.val, 0);
-
-                let prompt = "";
-                if (mode === 'analyze') {
-                    prompt = `Analysiere meine Lage: Net Worth ${wealth}€, Einkommen ${inc}€, Ausgaben ${exp}€, Sparrate ${inv}€. Notgroschen ${cash}€. 
-                    Kurz, prägnant, motivierend. Nenne einen 'Financial Stability Score' (0-100).`;
-                } else {
-                    prompt = `Einkommen ${inc}€, Ausgaben ${exp}€, Investments ${inv}€. Nenne mir 3 aggressive Strategien zur Erhöhung der Sparrate oder Optimierung des Portfolios.`;
-                }
-
-                const responseText = await this.callGemini(prompt);
-                aiDisplay.innerHTML = responseText || "AI Timeout. Bitte erneut versuchen.";
+            importData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        this.state = imported;
+                        this.save();
+                        location.reload();
+                    } catch (err) { alert("Fehler beim Importieren!"); }
+                };
+                reader.readAsText(file);
             },
 
-            async callGemini(prompt) {
-                const apiKey = ""; 
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-                const payload = {
-                    contents: [{ parts: [{ text: prompt }] }],
-                    systemInstruction: { parts: [{ text: "Du bist Henne's finanzieller Sparringspartner. Antworte direkt, motivierend und ohne Floskeln. Nutze deutsches Notfallpflege-Vokabular wenn passend." }] }
-                };
-                let retries = 3; let delay = 1000;
-                while (retries > 0) {
-                    try {
-                        const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-                        const result = await response.json();
-                        return result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    } catch (e) { retries--; if (retries === 0) return null; await new Promise(r => setTimeout(r, delay)); delay *= 2; }
-                }
-            }
+            format(v) { return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v); }
         };
         window.onload = () => app.init();
     </script>
