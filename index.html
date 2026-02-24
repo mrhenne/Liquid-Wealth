@@ -151,6 +151,13 @@
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
         }
+
+        /* Tooltip & Chart Styles */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body class="light">
@@ -310,6 +317,26 @@
             </div>
         </div>
 
+        <!-- Segment Deep Dive Analytics (New Section) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="liquid-glass p-6">
+                <h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-blue-600 text-center">Einnahmen-Mix</h3>
+                <div class="h-[200px]"><canvas id="chart-deep-income"></canvas></div>
+            </div>
+            <div class="liquid-glass p-6">
+                <h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-red-500 text-center">Ausgaben-Mix</h3>
+                <div class="h-[200px]"><canvas id="chart-deep-expenses"></canvas></div>
+            </div>
+            <div class="liquid-glass p-6">
+                <h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-emerald-500 text-center">Investment-Mix</h3>
+                <div class="h-[200px]"><canvas id="chart-deep-invest"></canvas></div>
+            </div>
+            <div class="liquid-glass p-6">
+                <h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-indigo-500 text-center">Asset-Mix</h3>
+                <div class="h-[200px]"><canvas id="chart-deep-assets"></canvas></div>
+            </div>
+        </div>
+
         <!-- Strategy & Charts -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
             <div class="xl:col-span-8 liquid-glass p-8">
@@ -436,7 +463,7 @@
                 chartMode: 'wealth',
                 db: {}
             },
-            charts: { history: null, comparison: null, year: null, yearSavings: null },
+            charts: { history: null, comparison: null, year: null, yearSavings: null, deepIncome: null, deepExpenses: null, deepInvest: null, deepAssets: null },
             draggedItem: null,
 
             async init() {
@@ -606,11 +633,9 @@
                 outer: for (const y of years) {
                     for (let m = 11; m >= 0; m--) {
                         const monthData = this.state.db[y][m];
-                        // Sum up all asset values that are recurring/active
                         const total = monthData.assets.filter(a => a.recurring).reduce((s, i) => s + i.val, 0);
                         if (total > 0) {
                             latestWealth = total;
-                            // Set string to the last day of that month for display
                             const lastDay = new Date(y, m + 1, 0);
                             latestDateStr = lastDay.toLocaleDateString('de-DE');
                             break outer;
@@ -772,6 +797,13 @@
                 const totalInc = data.income.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                 const totalExp = data.expenses.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                 const totalInv = (data.invest || []).filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
+                
+                // Deep Dive Mix Charts Update
+                this.updateDeepDiveDonut('deepIncome', data.income, ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe']);
+                this.updateDeepDiveDonut('deepExpenses', data.expenses, ['#ef4444', '#f87171', '#fb923c', '#fdba74', '#ffedd5']);
+                this.updateDeepDiveDonut('deepInvest', data.invest, ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5']);
+                this.updateDeepDiveDonut('deepAssets', data.assets, ['#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe']);
+
                 const canvasHist = document.getElementById('chart-history');
                 if(canvasHist) {
                     const ctx = canvasHist.getContext('2d');
@@ -788,14 +820,7 @@
                     this.charts.history = new Chart(ctx, {
                         type: 'line',
                         data: { labels, datasets: [{ label, data: dataPoints, borderColor: color, borderWidth: 5, tension: 0.4, fill: true, backgroundColor: color + '11', pointRadius: 4, pointBackgroundColor: color }] },
-                        options: { 
-                            responsive: true, maintainAspectRatio: false, 
-                            plugins: { legend: { display: false } }, 
-                            scales: { 
-                                x: { type: 'category' }, 
-                                y: { display: false, beginAtZero: false } 
-                            } 
-                        }
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { type: 'category' }, y: { display: false, beginAtZero: false } } }
                     });
                 }
                 const canvasComp = document.getElementById('chart-comparison');
@@ -805,9 +830,61 @@
                     this.charts.comparison = new Chart(ctx, { 
                         type: 'doughnut', 
                         data: { labels: ['Spend', 'Invest', 'Rest'], datasets: [{ data: [totalExp, totalInv, Math.max(0, totalInc - totalExp - totalInv)], backgroundColor: ['#ef4444', '#10b981', '#3b82f6'], borderWidth: 0 }] }, 
-                        options: { responsive: true, maintainAspectRatio: false, cutout: '82%' } 
+                        options: { responsive: true, maintainAspectRatio: false, cutout: '82%', plugins: { legend: { display: false } } } 
                     });
                 }
+            },
+
+            updateDeepDiveDonut(chartKey, items, colors) {
+                const canvasId = `chart-${chartKey.replace('deep', 'deep-').toLowerCase()}`;
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+
+                const activeItems = items.filter(i => i.recurring && i.val > 0);
+                const labels = activeItems.map(i => i.name);
+                const dataPoints = activeItems.map(i => i.val);
+
+                if (this.charts[chartKey]) this.charts[chartKey].destroy();
+
+                if (dataPoints.length === 0) {
+                    // Empty state logic
+                    this.charts[chartKey] = new Chart(canvas.getContext('2d'), {
+                        type: 'doughnut',
+                        data: { labels: ['Keine Daten'], datasets: [{ data: [1], backgroundColor: ['#cbd5e1'] }] },
+                        options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+                    });
+                    return;
+                }
+
+                this.charts[chartKey] = new Chart(canvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data: dataPoints,
+                            backgroundColor: colors,
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percent = Math.round((context.raw / total) * 100);
+                                        return `${context.label}: ${percent}% (${app.format(context.raw)})`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
             },
 
             showCopyModal() { document.getElementById('copy-modal').classList.remove('hidden'); },
