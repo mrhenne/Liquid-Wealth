@@ -181,7 +181,7 @@
 
                     <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
                     <button onclick="app.showSettingsModal()" class="p-2 hover:bg-white/20 rounded-xl transition-all">⚙️</button>
-                    <button onclick="app.syncRecurring()" class="text-[10px] font-black bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/20 uppercase">Sync</button>
+                    <button onclick="app.showImportModal()" class="text-[10px] font-black bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/20 uppercase" title="Daten aus einem anderen Monat kopieren">Import</button>
                     <button onclick="app.toggleTheme()" class="px-3 py-1 text-lg">🌓</button>
                 </div>
             </div>
@@ -247,7 +247,6 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('income')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-blue-500 hover:text-white transition-all">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('income')" class="w-8 h-8 bg-black dark:bg-white text-white dark:text-black font-black rounded-lg text-xs">+</button>
                         <svg id="chevron-income" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
@@ -267,7 +266,6 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('expenses')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-red-500 hover:text-white transition-all">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('expenses')" class="w-8 h-8 bg-red-600 text-white font-black rounded-lg text-xs">+</button>
                         <svg id="chevron-expenses" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
@@ -287,7 +285,6 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('invest')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-emerald-500 hover:text-white transition-all">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('invest')" class="w-8 h-8 bg-emerald-600 text-white font-black rounded-lg text-xs">+</button>
                         <svg id="chevron-invest" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
@@ -307,7 +304,6 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('assets')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-blue-500 hover:text-white transition-all">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('assets')" class="w-8 h-8 bg-blue-600 text-white font-black rounded-lg text-xs">+</button>
                         <svg id="chevron-assets" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
@@ -400,6 +396,35 @@
         </div>
     </div>
 
+    <!-- Modal: Import -->
+    <div id="import-modal" class="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="liquid-glass max-w-sm w-full bg-white/95 dark:bg-slate-900/95 p-8 shadow-2xl">
+            <h3 class="text-lg font-black uppercase mb-6 text-center">Daten-Transfer</h3>
+            <p class="text-[10px] font-bold opacity-60 text-center mb-6 uppercase">Wähle die Quelle aus, um Werte in den aktuellen Monat zu übertragen. Bestehende Daten bleiben erhalten.</p>
+            <div class="space-y-4">
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="text-[11px] font-black uppercase opacity-60">Jahr</label>
+                        <select id="import-year" class="w-full mt-1"></select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-[11px] font-black uppercase opacity-60">Monat</label>
+                        <select id="import-month" class="w-full mt-1">
+                            <option value="0">Januar</option><option value="1">Februar</option><option value="2">März</option>
+                            <option value="3">April</option><option value="4">Mai</option><option value="5">Juni</option>
+                            <option value="6">Juli</option><option value="7">August</option><option value="8">September</option>
+                            <option value="9">Oktober</option><option value="10">November</option><option value="11">Dezember</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2 pt-4">
+                    <button onclick="app.executeImport()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-[11px] uppercase shadow-lg shadow-blue-600/20">DATEN ÜBERTRAGEN</button>
+                    <button onclick="app.hideImportModal()" class="w-full py-4 bg-slate-200 dark:bg-slate-800 font-black text-[11px] rounded-xl uppercase">ABBRECHEN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const app = {
             state: {
@@ -432,11 +457,13 @@
                 });
 
                 const yp = document.getElementById('ui-year');
+                const iyp = document.getElementById('import-year');
                 for(let i=2024; i<=2035; i++) {
                     const opt = document.createElement('option');
                     opt.value = i; opt.innerText = i;
                     if(i === this.state.year) opt.selected = true;
                     yp.appendChild(opt);
+                    iyp.appendChild(opt.cloneNode(true));
                 }
 
                 this.checkDB();
@@ -567,6 +594,7 @@
                 let latest = 0; let dStr = "--.--.----";
                 outer: for(let y of years) {
                     for(let m=11; m>=0; m--) {
+                        if (!this.state.db[y] || !this.state.db[y][m]) continue;
                         const total = this.state.db[y][m].assets.filter(a=>a.recurring).reduce((s,i)=>s+i.val,0);
                         if(total > 0) { latest = total; const ld = new Date(y, m+1, 0); dStr = ld.toLocaleDateString('de-DE'); break outer; }
                     }
@@ -592,7 +620,6 @@
                 setVal('kpi-wealth', this.format(tAss));
                 setVal('kpi-cashflow', this.format(tInc - tExp));
 
-                // Dependent Ratios
                 const expRatio = tInc > 0 ? Math.round((tExp / tInc) * 100) : 0;
                 const invRatio = tInc > 0 ? Math.round((tInv / tInc) * 100) : 0;
                 const setRatio = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
@@ -802,31 +829,33 @@
             add(t) { this.state.db[this.state.year][this.state.month][t].push({name:'Neu...',val:0,recurring:true}); this.render(); },
             remove(t, i) { this.state.db[this.state.year][this.state.month][t].splice(i, 1); this.render(); },
             
-            syncCategoryFromPrev(t) {
-                const cm = this.state.month; 
-                const pm = cm === 0 ? 11 : cm-1; 
-                const py = cm === 0 ? this.state.year-1 : this.state.year;
+            showImportModal() { document.getElementById('import-modal').classList.remove('hidden'); },
+            hideImportModal() { document.getElementById('import-modal').classList.add('hidden'); },
+            executeImport() {
+                const fromY = document.getElementById('import-year').value;
+                const fromM = parseInt(document.getElementById('import-month').value);
                 
-                if(!this.state.db[py] || !this.state.db[py][pm]) return;
+                if (!this.state.db[fromY] || !this.state.db[fromY][fromM]) return;
                 
-                const source = this.state.db[py][pm][t]; 
-                const target = this.state.db[this.state.year][this.state.month][t];
-                
-                source.forEach(s => {
-                    const exists = target.find(x => x.name === s.name);
-                    if (exists) {
-                        // Nur überschreiben, wenn der aktuelle Wert 0 ist (verhindert Datenverlust)
-                        if (exists.val === 0) exists.val = s.val;
-                        exists.recurring = s.recurring;
-                    } else {
-                        // Wenn der Posten noch gar nicht existiert, neu hinzufügen
-                        target.push(JSON.parse(JSON.stringify(s)));
-                    }
+                ['income', 'expenses', 'invest', 'assets'].forEach(t => {
+                    const source = this.state.db[fromY][fromM][t];
+                    const target = this.state.db[this.state.year][this.state.month][t];
+                    
+                    source.forEach(s => {
+                        const exists = target.find(x => x.name === s.name);
+                        if (exists) {
+                            if (exists.val === 0) exists.val = s.val;
+                            exists.recurring = s.recurring;
+                        } else {
+                            target.push(JSON.parse(JSON.stringify(s)));
+                        }
+                    });
                 });
+                
+                this.hideImportModal();
                 this.render();
             },
-            
-            syncRecurring() { ['income','expenses','invest','assets'].forEach(t => this.syncCategoryFromPrev(t)); },
+
             showSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); },
             hideSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); },
             toggleTheme() { this.state.theme = this.state.theme === 'light' ? 'dark' : 'light'; this.applyTheme(); this.save(); },
