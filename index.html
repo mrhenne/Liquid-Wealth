@@ -43,9 +43,10 @@
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
         }
 
+        /* Ticker Animation - Even Slower for better readability */
         @keyframes scroll {
-            0% { transform: translateX(80%); }
-            100% { transform: translateX(-150%); }
+            0% { transform: translateX(90%); }
+            100% { transform: translateX(-180%); }
         }
         .ticker-wrap {
             overflow: hidden;
@@ -57,7 +58,7 @@
         }
         .ticker-move {
             display: inline-block;
-            animation: scroll 80s linear infinite;
+            animation: scroll 100s linear infinite;
             font-weight: 800;
             font-size: 13px;
             text-transform: uppercase;
@@ -87,6 +88,7 @@
             50% { border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); }
         }
 
+        /* Fixed Collapsible Logic */
         .collapse-content {
             display: none;
             overflow: hidden;
@@ -114,6 +116,22 @@
             cursor: grab;
         }
         .item-row:active { cursor: grabbing; }
+
+        .stat-card-glow {
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card-glow::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            opacity: 0.1;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="light">
@@ -315,7 +333,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8 liquid-glass p-8">
-                <h3 class="text-xs font-black uppercase mb-8">Jahres-Dynamik</h3>
+                <h3 class="text-xs font-black uppercase mb-8">Jahres-Dynamik (Asset Wachstum vs. Cashflow)</h3>
                 <div class="h-[500px]"><canvas id="year-chart"></canvas></div>
             </div>
             <div class="lg:col-span-4 space-y-8">
@@ -687,6 +705,7 @@
                         interaction: { mode: 'index', intersect: false },
                         plugins: { legend: { position: 'top', labels: { font: { weight: '900', size: 10 } } } },
                         scales: { 
+                            x: { type: 'category' },
                             y: { grid: { display: false } },
                             y1: { position: 'right', display: false } 
                         }
@@ -707,7 +726,10 @@
                     },
                     options: { 
                         responsive: true, maintainAspectRatio: false, 
-                        scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } }
+                        scales: { 
+                            x: { type: 'category' },
+                            y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } 
+                        }
                     }
                 });
             },
@@ -764,7 +786,10 @@
                         options: { 
                             responsive: true, maintainAspectRatio: false, 
                             plugins: { legend: { display: false } }, 
-                            scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { weight: '900', size: 10 } } } } 
+                            scales: { 
+                                x: { type: 'category' },
+                                y: { display: false } 
+                            } 
                         }
                     });
                 }
