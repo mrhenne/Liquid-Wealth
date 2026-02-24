@@ -81,12 +81,6 @@
         }
         .dark input, .dark select { background-color: rgba(255, 255, 255, 0.05) !important; }
 
-        .breathe { animation: liquid-breathe 6s ease-in-out infinite; }
-        @keyframes liquid-breathe {
-            0%, 100% { border-color: var(--border); box-shadow: 0 0 5px transparent; }
-            50% { border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); }
-        }
-
         .collapse-content {
             display: none;
             overflow: hidden;
@@ -152,7 +146,6 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Tactical Live Wealth Header */
         .live-wealth-header {
             background: linear-gradient(to right, transparent, var(--accent-glow), transparent);
             border-top: 1px solid var(--border);
@@ -211,9 +204,9 @@
         <!-- Total Wealth Live Bar -->
         <div class="live-wealth-header w-full py-1 text-center">
             <span class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">
-                Live Status: <span id="header-wealth-val" class="text-blue-600">0 €</span> 
+                Letzter Net Worth: <span id="header-wealth-val" class="text-blue-600">0 €</span> 
                 <span class="mx-3 opacity-30">|</span> 
-                <span id="header-date" class="opacity-60">24.02.2026</span>
+                <span id="header-date" class="opacity-60">--.--.----</span>
             </span>
         </div>
     </nav>
@@ -223,24 +216,24 @@
         
         <!-- KPIs -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            <div class="liquid-glass p-6 breathe border-l-4 border-l-blue-600">
+            <div class="liquid-glass p-6 border-l-4 border-l-blue-600">
                 <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Net Worth</p>
                 <h2 id="kpi-wealth" class="text-2xl font-black tabular-nums">0 €</h2>
                 <p id="kpi-btc" class="text-[10px] font-bold text-orange-500 mt-1 uppercase">₿ 0 BTC</p>
             </div>
-            <div class="liquid-glass p-6 breathe border-l-4 border-l-emerald-600">
+            <div class="liquid-glass p-6 border-l-4 border-l-emerald-600">
                 <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-emerald-600">Cashflow</p>
                 <h2 id="kpi-cashflow" class="text-2xl font-black tabular-nums">0 €</h2>
                 <div id="kpi-savings-rate" class="text-[11px] font-bold text-emerald-500 mt-1 uppercase font-black">Sparrate: 0%</div>
             </div>
-            <div class="liquid-glass p-6 breathe border-l-4 border-l-blue-400">
+            <div class="liquid-glass p-6 border-l-4 border-l-blue-400">
                 <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Restbudget</p>
                 <h2 id="kpi-remaining" class="text-2xl font-black tabular-nums">0 €</h2>
                 <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 mt-2 rounded-full overflow-hidden">
                     <div id="savings-progress" class="bg-blue-500 h-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
-            <div class="liquid-glass p-6 breathe border-l-4 border-l-orange-500">
+            <div class="liquid-glass p-6 border-l-4 border-l-orange-500">
                 <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-orange-500">Notgroschen</p>
                 <h2 id="kpi-emergency" class="text-2xl font-black tabular-nums">0%</h2>
                 <p id="kpi-emergency-months" class="text-[11px] font-bold opacity-40 mt-1 uppercase font-black">0.0 Monate</p>
@@ -468,9 +461,6 @@
                     });
                 }
 
-                // Initial date for display
-                document.getElementById('header-date').innerText = new Date().toLocaleDateString('de-DE');
-
                 this.checkDB();
                 this.applyTheme();
                 this.updateDateUI();
@@ -547,6 +537,7 @@
                 } else {
                     this.renderYearView();
                 }
+                this.updateLatestWealthHeader();
                 this.save();
             },
 
@@ -607,6 +598,32 @@
                 document.getElementById('ui-year').value = this.state.year;
             },
 
+            updateLatestWealthHeader() {
+                const years = Object.keys(this.state.db).sort((a, b) => b - a);
+                let latestWealth = 0;
+                let latestDateStr = "--.--.----";
+
+                outer: for (const y of years) {
+                    for (let m = 11; m >= 0; m--) {
+                        const monthData = this.state.db[y][m];
+                        // Sum up all asset values that are recurring/active
+                        const total = monthData.assets.filter(a => a.recurring).reduce((s, i) => s + i.val, 0);
+                        if (total > 0) {
+                            latestWealth = total;
+                            // Set string to the last day of that month for display
+                            const lastDay = new Date(y, m + 1, 0);
+                            latestDateStr = lastDay.toLocaleDateString('de-DE');
+                            break outer;
+                        }
+                    }
+                }
+
+                const hwv = document.getElementById('header-wealth-val');
+                const hd = document.getElementById('header-date');
+                if (hwv) hwv.innerText = this.format(latestWealth);
+                if (hd) hd.innerText = latestDateStr;
+            },
+
             toggleRecurring(type, idx) { const item = this.state.db[this.state.year][this.state.month][type][idx]; item.recurring = !item.recurring; this.render(); },
 
             syncCategoryFromPrev(type) {
@@ -641,9 +658,6 @@
                 setVal('sum-expenses', this.format(totalExp));
                 setVal('sum-invest', this.format(totalInv));
                 setVal('sum-assets', this.format(totalAssets));
-
-                // Global Wealth Updates
-                setVal('header-wealth-val', this.format(totalAssets));
 
                 const cash = data.assets.filter(a => a.recurring && (a.name.toLowerCase().includes('cash') || a.name.toLowerCase().includes('notgroschen'))).reduce((s, i) => s + i.val, 0);
                 const btcPrice = parseFloat(document.getElementById('cfg-btc').value) || 1;
