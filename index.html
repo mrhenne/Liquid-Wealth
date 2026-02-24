@@ -43,7 +43,6 @@
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Ticker Animation - Ultra Slower as requested */
         @keyframes scroll {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-250%); }
@@ -126,6 +125,33 @@
             opacity: 0.1;
             pointer-events: none;
         }
+
+        /* --- New Date Switcher Styles --- */
+        .date-chip {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            user-select: none;
+        }
+        .date-chip.active {
+            background-color: var(--accent);
+            color: white;
+            box-shadow: 0 4px 12px var(--accent-glow);
+            transform: scale(1.05);
+        }
+        .date-chip:hover:not(.active) {
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+
+        .view-fade {
+            animation: viewFadeIn 0.4s ease-out forwards;
+        }
+        @keyframes viewFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="light">
@@ -139,7 +165,7 @@
 
     <!-- Navigation -->
     <nav id="nav-main" class="header-solid p-4 md:px-8 sticky top-0 backdrop-blur-md bg-opacity-90">
-        <div class="max-w-[2400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="max-w-[2400px] mx-auto flex flex-col xl:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-4">
                 <div class="bg-black text-white dark:bg-white dark:text-black w-10 h-10 flex items-center justify-center rounded-xl font-black text-xl shadow-xl">LW</div>
                 <div>
@@ -148,20 +174,32 @@
                 </div>
             </div>
             
-            <div class="flex items-center gap-2 bg-slate-200/40 dark:bg-slate-800/40 p-2 rounded-2xl border border-slate-300/50 dark:border-slate-700/50">
-                <button onclick="app.toggleView()" id="view-toggle-btn" class="text-[10px] font-black bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 uppercase">Jahresübersicht</button>
-                <button onclick="app.showSettingsModal()" class="p-2 hover:bg-white/20 rounded-xl transition-all">⚙️</button>
-                <button onclick="app.syncRecurring()" class="text-[10px] font-black bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/20 uppercase">Global Sync</button>
-                <button onclick="app.showCopyModal()" class="text-[10px] font-black bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl transition-all shadow-lg shadow-emerald-600/20 uppercase">Kopieren</button>
-                <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
-                <select id="ui-year" onchange="app.changeDate()" class="text-xs bg-transparent border-none py-1"></select>
-                <select id="ui-month" onchange="app.changeDate()" class="text-xs bg-transparent border-none py-1 uppercase">
-                    <option value="0">JAN</option><option value="1">FEB</option><option value="2">MÄR</option>
-                    <option value="3">APR</option><option value="4">MAI</option><option value="5">JUN</option>
-                    <option value="6">JUL</option><option value="7">AUG</option><option value="8">SEP</option>
-                    <option value="9">OKT</option><option value="10">NOV</option><option value="11">DEZ</option>
-                </select>
-                <button onclick="app.toggleTheme()" class="px-3 py-1 text-lg">🌓</button>
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <!-- Custom Month Switcher -->
+                <div id="month-nav" class="flex items-center gap-1 bg-slate-200/40 dark:bg-slate-800/40 p-1.5 rounded-2xl border border-slate-300/50 dark:border-slate-700/50 no-scrollbar overflow-x-auto max-w-[320px] sm:max-w-none">
+                    <div onclick="app.setMonth(0)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Jan</div>
+                    <div onclick="app.setMonth(1)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Feb</div>
+                    <div onclick="app.setMonth(2)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Mär</div>
+                    <div onclick="app.setMonth(3)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Apr</div>
+                    <div onclick="app.setMonth(4)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Mai</div>
+                    <div onclick="app.setMonth(5)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Jun</div>
+                    <div onclick="app.setMonth(6)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Jul</div>
+                    <div onclick="app.setMonth(7)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Aug</div>
+                    <div onclick="app.setMonth(8)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Sep</div>
+                    <div onclick="app.setMonth(9)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Okt</div>
+                    <div onclick="app.setMonth(10)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Nov</div>
+                    <div onclick="app.setMonth(11)" class="date-chip px-3 py-1.5 text-[10px] font-black rounded-xl uppercase">Dez</div>
+                </div>
+
+                <div class="flex items-center gap-2 bg-slate-200/40 dark:bg-slate-800/40 p-1.5 rounded-2xl border border-slate-300/50 dark:border-slate-700/50">
+                    <select id="ui-year" onchange="app.setYear(this.value)" class="text-[10px] font-black bg-transparent border-none py-1 h-8"></select>
+                    <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
+                    <button onclick="app.toggleView()" id="view-toggle-btn" class="text-[10px] font-black bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 uppercase">Jahresübersicht</button>
+                    <button onclick="app.showSettingsModal()" class="p-2 hover:bg-white/20 rounded-xl transition-all">⚙️</button>
+                    <button onclick="app.syncRecurring()" class="text-[10px] font-black bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/20 uppercase">Global Sync</button>
+                    <button onclick="app.showCopyModal()" class="text-[10px] font-black bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl transition-all shadow-lg shadow-emerald-600/20 uppercase">Kopieren</button>
+                    <button onclick="app.toggleTheme()" class="px-3 py-1 text-lg">🌓</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -208,7 +246,6 @@
         <!-- Scaling Bento Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 4xl:grid-cols-4 gap-8 items-start">
             
-            <!-- Category Boxes -->
             <div class="liquid-glass overflow-hidden h-full">
                 <div onclick="app.toggleCollapse('col-income', 'chevron-income')" class="p-6 bg-slate-100 dark:bg-slate-800/40 cursor-pointer flex justify-between items-center group">
                     <div><h3 class="text-xs font-black uppercase leading-none">Einnahmen</h3><span id="sum-income" class="text-[13px] font-bold text-blue-600">0 €</span></div>
@@ -275,8 +312,8 @@
                         Portfolio Intelligence
                     </h3>
                     <div class="flex gap-2">
-                        <button onclick="app.updateCharts('wealth')" class="text-[10px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg">WEALTH</button>
-                        <button onclick="app.updateCharts('cashflow')" class="text-[10px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg">CASHFLOW</button>
+                        <button onclick="app.updateCharts('wealth')" class="text-[10px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg uppercase">Wealth</button>
+                        <button onclick="app.updateCharts('cashflow')" class="text-[10px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg uppercase">Cashflow</button>
                     </div>
                 </div>
                 <div class="h-[380px]"><canvas id="chart-history"></canvas></div>
@@ -414,10 +451,10 @@
                         }
                     });
                 }
-                document.getElementById('ui-month').value = this.state.month;
 
                 this.checkDB();
                 this.applyTheme();
+                this.updateDateUI();
                 this.render();
                 this.startTicker();
             },
@@ -473,6 +510,14 @@
             },
 
             render() {
+                // Add fade animation to main areas
+                ['month-view', 'year-view'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.classList.remove('view-fade');
+                    void el.offsetWidth; // trigger reflow
+                    el.classList.add('view-fade');
+                });
+
                 if(this.state.view === 'month') {
                     const data = this.state.db[this.state.year][this.state.month];
                     this.renderList('income', data.income);
@@ -497,13 +542,10 @@
                     div.draggable = true;
                     div.dataset.index = idx;
                     div.dataset.type = type;
-                    
                     div.ondragstart = (e) => this.handleDragStart(e, type, idx);
                     div.ondragend = (e) => e.target.classList.remove('dragging');
 
-                    // Checkbox logic: For Invest type it confirms if it's a Savings Rate
-                    const checkboxTitle = type === 'invest' ? "Als Sparrate werten & Wiederkehrend" : "Aktivieren & Wiederkehrend";
-
+                    const checkboxTitle = type === 'invest' ? "Sparrate-Vormerkung" : "Aktiv";
                     div.innerHTML = `
                         <input type="checkbox" ${item.recurring ? 'checked' : ''} onchange="app.toggleRecurring('${type}', ${idx})" title="${checkboxTitle}" class="w-4 h-4 cursor-pointer accent-blue-600">
                         <input type="text" value="${item.name}" onchange="app.updateItem('${type}', ${idx}, 'name', this.value)" class="flex-1 text-[11px] p-2 bg-transparent border-none font-bold">
@@ -514,14 +556,8 @@
                 });
             },
 
-            handleDragStart(e, type, idx) {
-                this.draggedItem = { type, idx };
-                e.target.classList.add('dragging');
-                e.dataTransfer.effectAllowed = 'move';
-            },
-
+            handleDragStart(e, type, idx) { this.draggedItem = { type, idx }; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; },
             handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; },
-
             handleDrop(e, targetType) {
                 e.preventDefault();
                 if (!this.draggedItem) return;
@@ -540,6 +576,28 @@
                 } else { targetList.push(item); }
                 this.draggedItem = null;
                 this.render();
+            },
+
+            setMonth(m) {
+                this.state.month = m;
+                this.updateDateUI();
+                this.render();
+            },
+
+            setYear(y) {
+                this.state.year = parseInt(y);
+                this.checkDB();
+                this.updateDateUI();
+                this.render();
+            },
+
+            updateDateUI() {
+                const chips = document.querySelectorAll('#month-nav .date-chip');
+                chips.forEach((c, idx) => {
+                    if(idx === this.state.month) c.classList.add('active');
+                    else c.classList.remove('active');
+                });
+                document.getElementById('ui-year').value = this.state.year;
             },
 
             toggleRecurring(type, idx) {
@@ -562,7 +620,6 @@
                     if(!target.find(t => t.name === item.name)) {
                         target.push(JSON.parse(JSON.stringify(item)));
                     } else {
-                        // If exists, just update value from previous month for consistency
                         const existing = target.find(t => t.name === item.name);
                         existing.val = item.val;
                     }
@@ -570,9 +627,7 @@
                 this.render();
             },
 
-            syncRecurring() {
-                ['income', 'expenses', 'invest', 'assets'].forEach(type => this.syncCategoryFromPrev(type));
-            },
+            syncRecurring() { ['income', 'expenses', 'invest', 'assets'].forEach(type => this.syncCategoryFromPrev(type)); },
 
             toggleCollapse(id, chevronId) {
                 const el = document.getElementById(id);
@@ -586,29 +641,16 @@
                 this.render();
             },
 
-            add(type) {
-                this.state.db[this.state.year][this.state.month][type].push({ name: 'Neu...', val: 0, recurring: true });
-                this.render();
-            },
-
-            remove(type, idx) {
-                this.state.db[this.state.year][this.state.month][type].splice(idx, 1);
-                this.render();
-            },
+            add(type) { this.state.db[this.state.year][this.state.month][type].push({ name: 'Neu...', val: 0, recurring: true }); this.render(); },
+            remove(type, idx) { this.state.db[this.state.year][this.state.month][type].splice(idx, 1); this.render(); },
 
             calc() {
                 const data = this.state.db[this.state.year][this.state.month];
                 const totalInc = data.income.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                 const totalExp = data.expenses.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
-                // Sparrate: Only marked investments + remaining cashflow? No, usually user wants specific flagged invest.
-                // Request says: "Haken der bestätigt dass es eine Sparrate ist"
                 const totalInv = (data.invest || []).filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                 const totalAssets = data.assets.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
-                
-                const setVal = (id, val, color) => {
-                    const el = document.getElementById(id);
-                    if(el) { el.innerText = val; if(color) el.style.color = color; }
-                };
+                const setVal = (id, val, color) => { const el = document.getElementById(id); if(el) { el.innerText = val; if(color) el.style.color = color; } };
 
                 setVal('sum-income', this.format(totalInc));
                 setVal('sum-expenses', this.format(totalExp));
@@ -624,33 +666,23 @@
                 setVal('kpi-wealth', this.format(totalAssets));
                 setVal('kpi-btc', `₿ ${(totalAssets / btcPrice).toFixed(6)} BTC`);
                 setVal('kpi-cashflow', this.format(totalInc - totalExp));
-                
                 const rate = totalInc > 0 ? Math.round((totalInv / totalInc) * 100) : 0;
                 setVal('kpi-savings-rate', `Sparrate: ${rate}%`);
-
                 const remaining = totalInc - totalExp - totalInv;
                 setVal('kpi-remaining', this.format(remaining), remaining < 0 ? '#ef4444' : (remaining > 0 ? '#10b981' : 'inherit'));
-                
-                const sp = document.getElementById('savings-progress');
-                if(sp) sp.style.width = `${Math.min(Math.max(0, rate), 100)}%`;
-
+                if(document.getElementById('savings-progress')) document.getElementById('savings-progress').style.width = `${Math.min(Math.max(0, rate), 100)}%`;
                 const neededEmergency = totalExp * emerMonthsTarget;
                 setVal('ui-emergency-target', this.format(neededEmergency));
-                
                 const emerPercent = neededEmergency > 0 ? Math.round((cash / neededEmergency) * 100) : 0;
                 setVal('kpi-emergency', `${emerPercent}%`);
                 setVal('kpi-emergency-months', `${totalExp > 0 ? (cash / totalExp).toFixed(1) : 0.0} Monate`);
-
                 const runway = totalExp > 0 ? Math.floor(totalAssets / totalExp) : 0;
                 setVal('kpi-runway', runway + " M.");
-
-                if(totalAssets >= target) {
-                    setVal('kpi-fire', "JETZT");
-                } else {
+                if(totalAssets >= target) setVal('kpi-fire', "JETZT");
+                else {
                     const monthlySave = totalInv + Math.max(0, remaining);
-                    if(monthlySave <= 0) {
-                        setVal('kpi-fire', "∞ J.");
-                    } else {
+                    if(monthlySave <= 0) setVal('kpi-fire', "∞ J.");
+                    else {
                         let y = 0; let w = totalAssets;
                         while(w < target && y < 100) { w = (w * (1 + roi/100)) + (monthlySave * 12); y++; }
                         setVal('kpi-fire', y + " J.");
@@ -670,9 +702,7 @@
                     const minv = m.invest.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                     const ma = m.assets.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                     incData.push(mi); expData.push(me); assetData.push(ma);
-                    if(mi > 0 || me > 0) {
-                        totalIncome += mi; totalExpenses += me; totalInvest += minv; filledMonths++;
-                    }
+                    if(mi > 0 || me > 0) { totalIncome += mi; totalExpenses += me; totalInvest += minv; filledMonths++; }
                 });
 
                 const avgInc = totalIncome / (filledMonths || 1);
@@ -680,7 +710,6 @@
                 document.getElementById('year-avg-expenses').innerText = this.format(totalExpenses / (filledMonths || 1));
                 document.getElementById('year-avg-savings').innerText = this.format(totalInvest / (filledMonths || 1));
                 
-                // Calculate savings trend based on AVG Income
                 yearData.forEach((m) => {
                     const minv = m.invest.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                     savingsRates.push(avgInc > 0 ? Math.round((minv / avgInc) * 100) : 0);
@@ -743,60 +772,26 @@
                 const totalInc = data.income.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                 const totalExp = data.expenses.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                 const totalInv = (data.invest || []).filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
-
                 const canvasHist = document.getElementById('chart-history');
                 if(canvasHist) {
                     const ctx = canvasHist.getContext('2d');
                     const yearData = this.state.db[this.state.year];
                     const labels = ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"];
-                    let dataPoints = [];
-                    let label = "";
-                    let color = "#2563eb";
-
-                    if(mode === 'wealth') {
-                        dataPoints = yearData.map(m => m.assets.filter(i => i.recurring).reduce((s, i) => s + i.val, 0));
-                        label = "Net Worth";
-                    } else {
-                        dataPoints = yearData.map(m => {
-                            const inc = m.income.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
-                            const exp = m.expenses.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
-                            return inc - exp;
-                        });
-                        label = "Cashflow";
-                        color = "#10b981";
-                    }
-
+                    let dataPoints = []; let label = ""; let color = "#2563eb";
+                    if(mode === 'wealth') { dataPoints = yearData.map(m => m.assets.filter(i => i.recurring).reduce((s, i) => s + i.val, 0)); label = "Net Worth"; }
+                    else { dataPoints = yearData.map(m => { const inc = m.income.filter(i => i.recurring).reduce((s, i) => s + i.val, 0); const exp = m.expenses.filter(i => i.recurring).reduce((s, i) => s + i.val, 0); return inc - exp; }); label = "Cashflow"; color = "#10b981"; }
                     if(this.charts.history) this.charts.history.destroy();
                     this.charts.history = new Chart(ctx, {
                         type: 'line',
-                        data: {
-                            labels,
-                            datasets: [{
-                                label, data: dataPoints, borderColor: color, borderWidth: 5, tension: 0.4, fill: true,
-                                backgroundColor: mode === 'wealth' ? 'rgba(37, 99, 235, 0.05)' : 'rgba(16, 185, 129, 0.05)',
-                                pointRadius: 4, pointBackgroundColor: color
-                            }]
-                        },
+                        data: { labels, datasets: [{ label, data: dataPoints, borderColor: color, borderWidth: 5, tension: 0.4, fill: true, backgroundColor: mode === 'wealth' ? 'rgba(37, 99, 235, 0.05)' : 'rgba(16, 185, 129, 0.05)', pointRadius: 4, pointBackgroundColor: color }] },
                         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { type: 'category' }, y: { display: false } } }
                     });
                 }
-
                 const canvasComp = document.getElementById('chart-comparison');
                 if(canvasComp) {
                     const ctx = canvasComp.getContext('2d');
                     if(this.charts.comparison) this.charts.comparison.destroy();
-                    this.charts.comparison = new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Spend', 'Invest', 'Rest'],
-                            datasets: [{ 
-                                data: [totalExp, totalInv, Math.max(0, totalInc - totalExp - totalInv)], 
-                                backgroundColor: ['#ef4444', '#10b981', '#3b82f6'], 
-                                borderWidth: 0
-                            }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false, cutout: '82%' }
-                    });
+                    this.charts.comparison = new Chart(ctx, { type: 'doughnut', data: { labels: ['Spend', 'Invest', 'Rest'], datasets: [{ data: [totalExp, totalInv, Math.max(0, totalInc - totalExp - totalInv)], backgroundColor: ['#ef4444', '#10b981', '#3b82f6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '82%' } });
                 }
             },
 
@@ -804,39 +799,19 @@
             hideCopyModal() { document.getElementById('copy-modal').classList.add('hidden'); },
             showSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); },
             hideSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); },
-            
             executeCopy() {
                 const sYear = document.getElementById('copy-year').value;
                 const sMonth = document.getElementById('copy-month').value;
-                if (this.state.db[sYear] && this.state.db[sYear][sMonth]) {
-                    const source = JSON.parse(JSON.stringify(this.state.db[sYear][sMonth]));
-                    this.state.db[this.state.year][this.state.month] = source;
-                    this.render();
-                    this.hideCopyModal();
-                }
+                if (this.state.db[sYear] && this.state.db[sYear][sMonth]) { this.state.db[this.state.year][this.state.month] = JSON.parse(JSON.stringify(this.state.db[sYear][sMonth])); this.render(); this.hideCopyModal(); }
             },
-
-            changeDate() {
-                this.state.year = parseInt(document.getElementById('ui-year').value);
-                this.state.month = parseInt(document.getElementById('ui-month').value);
-                this.checkDB();
-                this.render();
-            },
-
-            toggleTheme() {
-                this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
-                this.applyTheme();
-                this.save();
-            },
-
+            changeDate() { /* Internal placeholder */ },
+            toggleTheme() { this.state.theme = this.state.theme === 'light' ? 'dark' : 'light'; this.applyTheme(); this.save(); },
             applyTheme() { document.body.className = this.state.theme; },
             save() { localStorage.setItem('lw_tactical_v13', JSON.stringify(this.state)); },
             export() {
                 const blob = new Blob([JSON.stringify(this.state)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url;
-                a.download = `lw_backup_${this.state.year}.json`;
-                a.click();
+                const a = document.createElement('a'); a.href = url; a.download = `lw_backup_${this.state.year}.json`; a.click();
             },
             format(v) { return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v); }
         };
