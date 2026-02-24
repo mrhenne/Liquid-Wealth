@@ -143,11 +143,6 @@
         .nav-btn-inactive:hover {
             background-color: rgba(203, 213, 225, 0.8);
         }
-
-        /* Tooltip Helper */
-        .tooltip-icon {
-            @apply inline-flex items-center justify-center w-3.5 h-3.5 ml-1 text-[8px] border border-current rounded-full opacity-40 hover:opacity-100 cursor-help;
-        }
     </style>
 </head>
 <body class="light">
@@ -203,35 +198,35 @@
     <!-- KPI BAR (Global) -->
     <div class="max-w-[2400px] mx-auto px-4 md:px-8 pt-8">
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            <div class="liquid-glass p-6 border-l-4 border-l-blue-600" title="Dein gesamter Bestand (Assets) in diesem Monat.">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Net Worth <span class="tooltip-icon">?</span></p>
+            <div class="liquid-glass p-6 border-l-4 border-l-blue-600" title="Dein gesamter Bestand (Assets) in diesem Monat. Summe aller aktivierten Konten und Bestände.">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Net Worth</p>
                 <h2 id="kpi-wealth" class="text-2xl font-black tabular-nums">0 €</h2>
                 <p id="kpi-btc" class="text-[10px] font-bold text-orange-500 mt-1 uppercase">₿ 0 BTC</p>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-emerald-600" title="Dein monatlicher Überschuss (Einnahmen minus Ausgaben).">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-emerald-600">Cashflow <span class="tooltip-icon">?</span></p>
+            <div class="liquid-glass p-6 border-l-4 border-l-emerald-600" title="Dein monatlicher Überschuss: Einnahmen minus Ausgaben. Was am Ende wirklich hängen bleibt.">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-emerald-600">Cashflow</p>
                 <h2 id="kpi-cashflow" class="text-2xl font-black tabular-nums">0 €</h2>
                 <div id="kpi-savings-rate" class="text-[11px] font-bold text-emerald-500 mt-1 uppercase font-black">Sparrate: 0%</div>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-blue-400" title="Geld, das nach Ausgaben und geplanten Investments noch übrig ist.">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Restbudget <span class="tooltip-icon">?</span></p>
+            <div class="liquid-glass p-6 border-l-4 border-l-blue-400" title="Geld, das nach Ausgaben und geplanten Investments noch übrig ist. Dein Spielraum für Konsum oder Zusatz-Invests.">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Restbudget</p>
                 <h2 id="kpi-remaining" class="text-2xl font-black tabular-nums">0 €</h2>
                 <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 mt-2 rounded-full overflow-hidden">
                     <div id="savings-progress" class="bg-blue-500 h-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-orange-500" title="Verhältnis deines Cash-Bestands zu deinem Sicherheitsziel (Monatsausgaben).">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-orange-500">Notgroschen <span class="tooltip-icon">?</span></p>
+            <div class="liquid-glass p-6 border-l-4 border-l-orange-500" title="Fortschritt deines Sicherheitsnetz-Ziels. Basierend auf deinen monatlichen Ausgaben mal deinem Ziel-Faktor.">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-orange-500">Notgroschen</p>
                 <h2 id="kpi-emergency" class="text-2xl font-black tabular-nums">0%</h2>
                 <p id="kpi-emergency-months" class="text-[11px] font-bold opacity-40 mt-1 uppercase font-black">0.0 Monate</p>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-indigo-600" title="Geschätzte Jahre bis zum FIRE-Ziel bei aktueller Sparrate und Rendite.">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-indigo-500">FIRE Roadmap <span class="tooltip-icon">?</span></p>
+            <div class="liquid-glass p-6 border-l-4 border-l-indigo-600" title="Schätzung, wann du dein FIRE-Ziel erreichst. Berücksichtigt Zinseszinseffekt und monatliche Investments.">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-indigo-500">FIRE Roadmap</p>
                 <h2 id="kpi-fire" class="text-2xl font-black tabular-nums">-- J.</h2>
                 <p id="ui-fire-target-info" class="text-[11px] font-bold opacity-40 mt-1 uppercase font-black">Ziel: 1M €</p>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-slate-400" title="Wie viele Monate du ohne Einkommen von deinem Net Worth leben könntest.">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-slate-500">Runway <span class="tooltip-icon">?</span></p>
+            <div class="liquid-glass p-6 border-l-4 border-l-slate-400" title="Die 'Überlebensdauer': Wie viele Monate du bei aktuellem Lebensstandard von deinen Reserven leben könntest.">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-slate-500">Runway</p>
                 <h2 id="kpi-runway" class="text-2xl font-black tabular-nums">0 M.</h2>
                 <p class="text-[11px] font-bold opacity-40 mt-1 uppercase font-black">Survival Mode</p>
             </div>
@@ -245,7 +240,7 @@
             <div class="liquid-glass overflow-hidden h-full">
                 <div onclick="app.toggleCollapse('col-income', 'chevron-income')" class="p-6 bg-slate-100 dark:bg-slate-800/40 cursor-pointer flex justify-between items-center group" title="Alle Zuflüsse in diesem Monat. Basis (100%) für Cashflow-Analysen.">
                     <div>
-                        <h3 class="text-xs font-black uppercase leading-none">Einnahmen <span class="tooltip-icon">?</span></h3>
+                        <h3 class="text-xs font-black uppercase leading-none">Einnahmen</h3>
                         <div class="flex items-baseline gap-2 mt-1">
                             <span id="sum-income" class="text-[13px] font-bold text-blue-600">0 €</span>
                             <span class="text-[9px] font-black opacity-40 uppercase">100% Base</span>
@@ -265,7 +260,7 @@
             <div class="liquid-glass overflow-hidden h-full">
                 <div onclick="app.toggleCollapse('col-expenses', 'chevron-expenses')" class="p-6 bg-red-50/50 dark:bg-red-900/10 cursor-pointer flex justify-between items-center group" title="Deine monatlichen Abflüsse. Der Prozentsatz zeigt den Anteil am Gesamteinkommen.">
                     <div>
-                        <h3 class="text-xs font-black uppercase text-red-600 leading-none">Ausgaben <span class="tooltip-icon">?</span></h3>
+                        <h3 class="text-xs font-black uppercase text-red-600 leading-none">Ausgaben</h3>
                         <div class="flex items-baseline gap-2 mt-1">
                             <span id="sum-expenses" class="text-[13px] font-bold text-red-500">0 €</span>
                             <span id="ratio-expenses" class="text-[9px] font-black opacity-40 uppercase">0% of Inc</span>
@@ -285,7 +280,7 @@
             <div class="liquid-glass overflow-hidden h-full">
                 <div onclick="app.toggleCollapse('col-invest', 'chevron-invest')" class="p-6 bg-emerald-50/50 dark:bg-emerald-900/10 cursor-pointer flex justify-between items-center group" title="Aktive Sparraten. Der Prozentsatz zeigt deine Sparquote bezogen auf das Einkommen.">
                     <div>
-                        <h3 class="text-xs font-black uppercase text-emerald-600 leading-none">Investments <span class="tooltip-icon">?</span></h3>
+                        <h3 class="text-xs font-black uppercase text-emerald-600 leading-none">Investments</h3>
                         <div class="flex items-baseline gap-2 mt-1">
                             <span id="sum-invest" class="text-[13px] font-bold text-emerald-500">0 €</span>
                             <span id="ratio-invest" class="text-[9px] font-black opacity-40 uppercase">0% Rate</span>
@@ -305,7 +300,7 @@
             <div class="liquid-glass overflow-hidden h-full">
                 <div onclick="app.toggleCollapse('col-assets', 'chevron-assets')" class="p-6 bg-blue-50/50 dark:bg-blue-900/10 cursor-pointer flex justify-between items-center group" title="Dein aktueller Vermögensstand am Ende des Monats.">
                     <div>
-                        <h3 class="text-xs font-black uppercase text-blue-600 leading-none">Bestand (Assets) <span class="tooltip-icon">?</span></h3>
+                        <h3 class="text-xs font-black uppercase text-blue-600 leading-none">Bestand (Assets)</h3>
                         <div class="flex items-baseline gap-2 mt-1">
                             <span id="sum-assets" class="text-[13px] font-bold text-blue-500">0 €</span>
                             <span class="text-[9px] font-black opacity-40 uppercase">Net Worth</span>
@@ -355,22 +350,22 @@
     <!-- YEAR VIEW -->
     <main id="view-year" class="max-w-[2400px] mx-auto p-4 md:p-8 space-y-8 hidden-view">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="liquid-glass p-8 border-l-4 border-l-blue-600">
+            <div class="liquid-glass p-8 border-l-4 border-l-blue-600" title="Durchschnittliches monatliches Einkommen über alle befüllten Monate des Jahres.">
                 <p class="text-[11px] font-black opacity-60 uppercase">Ø Einnahmen</p>
                 <h2 id="year-avg-income" class="text-3xl font-black tabular-nums">0 €</h2>
                 <p class="text-[9px] font-black opacity-40 uppercase mt-1">100% Basis</p>
             </div>
-            <div class="liquid-glass p-8 border-l-4 border-l-red-500">
+            <div class="liquid-glass p-8 border-l-4 border-l-red-500" title="Durchschnittliche monatliche Ausgaben. Der Prozentsatz zeigt die durchschnittliche 'Burn Rate'.">
                 <p class="text-[11px] font-black opacity-60 uppercase">Ø Ausgaben</p>
                 <h2 id="year-avg-expenses" class="text-3xl font-black tabular-nums">0 €</h2>
                 <p id="year-exp-ratio" class="text-[9px] font-black opacity-40 uppercase mt-1">0% vom Einkommen</p>
             </div>
-            <div class="liquid-glass p-8 border-l-4 border-l-emerald-500">
+            <div class="liquid-glass p-8 border-l-4 border-l-emerald-500" title="Durchschnittliche monatliche Investments. Dein 'Efficiency Score' im Jahresdurchschnitt.">
                 <p class="text-[11px] font-black opacity-60 uppercase">Ø Sparrate</p>
                 <h2 id="year-avg-savings" class="text-3xl font-black tabular-nums">0 €</h2>
                 <p id="year-sav-ratio" class="text-[9px] font-black opacity-40 uppercase mt-1">0% Sparquote</p>
             </div>
-            <div class="liquid-glass p-8 border-l-4 border-l-indigo-600">
+            <div class="liquid-glass p-8 border-l-4 border-l-indigo-600" title="Gesamtes Vermögenswachstum (oder Verlust) seit dem ersten befüllten Monat des Jahres.">
                 <p class="text-[11px] font-black opacity-60 uppercase">Wachstum YTD</p>
                 <h2 id="year-wealth-delta" class="text-3xl font-black tabular-nums">0 €</h2>
                 <p id="year-growth-percent" class="text-[10px] font-bold text-indigo-500 uppercase mt-1">+0%</p>
