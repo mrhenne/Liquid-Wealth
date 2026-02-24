@@ -350,22 +350,22 @@
     <!-- YEAR VIEW -->
     <main id="view-year" class="max-w-[2400px] mx-auto p-4 md:p-8 space-y-8 hidden-view">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="liquid-glass p-8 border-l-4 border-l-blue-600" title="Durchschnittliches monatliches Einkommen über alle befüllten Monate des Jahres.">
+            <div class="liquid-glass p-8 border-l-4 border-l-blue-600" title="Durchschnittliches monatliches Einkommen bis zum heutigen Monat (im laufenden Jahr) oder über das ganze Jahr (Vergangenheit).">
                 <p class="text-[11px] font-black opacity-60 uppercase">Ø Einnahmen</p>
                 <h2 id="year-avg-income" class="text-3xl font-black tabular-nums">0 €</h2>
                 <p class="text-[9px] font-black opacity-40 uppercase mt-1">100% Basis</p>
             </div>
-            <div class="liquid-glass p-8 border-l-4 border-l-red-500" title="Durchschnittliche monatliche Ausgaben. Der Prozentsatz zeigt die durchschnittliche 'Burn Rate'.">
+            <div class="liquid-glass p-8 border-l-4 border-l-red-500" title="Durchschnittliche monatliche Ausgaben. Der Prozentsatz zeigt die durchschnittliche 'Burn Rate' im Verhältnis zum Einkommen.">
                 <p class="text-[11px] font-black opacity-60 uppercase">Ø Ausgaben</p>
                 <h2 id="year-avg-expenses" class="text-3xl font-black tabular-nums">0 €</h2>
                 <p id="year-exp-ratio" class="text-[9px] font-black opacity-40 uppercase mt-1">0% vom Einkommen</p>
             </div>
-            <div class="liquid-glass p-8 border-l-4 border-l-emerald-500" title="Durchschnittliche monatliche Investments. Dein 'Efficiency Score' im Jahresdurchschnitt.">
+            <div class="liquid-glass p-8 border-l-4 border-l-emerald-500" title="Durchschnittliche monatliche Sparrate/Investments. Deine gemittelte Effizienz über den Zeitraum.">
                 <p class="text-[11px] font-black opacity-60 uppercase">Ø Sparrate</p>
                 <h2 id="year-avg-savings" class="text-3xl font-black tabular-nums">0 €</h2>
                 <p id="year-sav-ratio" class="text-[9px] font-black opacity-40 uppercase mt-1">0% Sparquote</p>
             </div>
-            <div class="liquid-glass p-8 border-l-4 border-l-indigo-600" title="Gesamtes Vermögenswachstum (oder Verlust) seit dem ersten befüllten Monat des Jahres.">
+            <div class="liquid-glass p-8 border-l-4 border-l-indigo-600" title="Gesamtes Vermögenswachstum seit Beginn des Jahres bis zum heutigen Tag (YTD).">
                 <p class="text-[11px] font-black opacity-60 uppercase">Wachstum YTD</p>
                 <h2 id="year-wealth-delta" class="text-3xl font-black tabular-nums">0 €</h2>
                 <p id="year-growth-percent" class="text-[10px] font-bold text-indigo-500 uppercase mt-1">+0%</p>
@@ -634,7 +634,6 @@
                 if (this.state.view !== 'analytics') return;
 
                 const data = this.state.db[this.state.year][this.state.month];
-                
                 const tInc = data.income.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
                 const tExp = data.expenses.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
                 const tInv = data.invest.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
@@ -680,7 +679,6 @@
                 updateDonut('deepInvest', data.invest, ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5']);
                 updateDonut('deepAssets', data.assets, ['#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe']);
 
-                // Comparison Chart (Gesamt-Zuweisung)
                 const compCanvas = document.getElementById('chart-comparison');
                 if(compCanvas) {
                     const ctx = compCanvas.getContext('2d');
@@ -700,7 +698,6 @@
                     });
                 }
 
-                // History Line
                 const yearData = this.state.db[this.state.year];
                 const labels = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
                 let pts = []; let lbl = ""; let col = "#2563eb";
@@ -722,42 +719,48 @@
 
             renderYearView() {
                 const yearData = this.state.db[this.state.year];
-                const inc = []; const exp = []; const ass = []; const rates = [];
-                let totalI = 0; let totalE = 0; let totalInv = 0; let months = 0;
+                const now = new Date();
+                const isCurrentYear = this.state.year === now.getFullYear();
+                const limitMonth = isCurrentYear ? now.getMonth() : 11;
                 
-                yearData.forEach(m => {
+                const inc = []; const exp = []; const ass = []; const rates = [];
+                let totalI = 0; let totalE = 0; let totalInv = 0; let monthsCounted = 0;
+                
+                yearData.forEach((m, idx) => {
                     const ti = m.income.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
                     const te = m.expenses.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
                     const ta = m.assets.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
                     const tinv = m.invest.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
+                    
                     inc.push(ti); exp.push(te); ass.push(ta);
-                    if(ti > 0 || te > 0) { totalI += ti; totalE += te; totalInv += tinv; months++; }
+                    rates.push(ti > 0 ? Math.round((tinv/ti)*100) : 0);
+
+                    if (idx <= limitMonth) {
+                        totalI += ti;
+                        totalE += te;
+                        totalInv += tinv;
+                        monthsCounted++;
+                    }
                 });
 
-                const avgI = totalI / (months||1);
-                const avgE = totalE / (months||1);
-                const avgS = totalInv / (months||1);
+                const avgI = totalI / (monthsCounted||1);
+                const avgE = totalE / (monthsCounted||1);
+                const avgS = totalInv / (monthsCounted||1);
 
                 document.getElementById('year-avg-income').innerText = this.format(avgI);
                 document.getElementById('year-avg-expenses').innerText = this.format(avgE);
                 document.getElementById('year-avg-savings').innerText = this.format(avgS);
                 
-                // Set Year Ratios
                 const expRatio = avgI > 0 ? Math.round((avgE / avgI) * 100) : 0;
                 const savRatio = avgI > 0 ? Math.round((avgS / avgI) * 100) : 0;
                 document.getElementById('year-exp-ratio').innerText = `${expRatio}% vom Einkommen`;
                 document.getElementById('year-sav-ratio').innerText = `${savRatio}% Sparquote`;
 
-                yearData.forEach(m => {
-                    const ti = m.income.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
-                    const tinv = m.invest.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
-                    rates.push(ti > 0 ? Math.round((tinv/ti)*100) : 0);
-                });
-
-                const delta = ass[ass.length-1] - (ass.find(a=>a>0)||0);
+                const startA = ass.find(a=>a>0) || 0;
+                const currentA = ass[limitMonth] || 0;
+                const delta = currentA - startA;
                 document.getElementById('year-wealth-delta').innerText = this.format(delta);
-                const startA = ass.find(a=>a>0)||1;
-                document.getElementById('year-growth-percent').innerText = `${delta >= 0 ? '+' : ''}${Math.round((delta/startA)*100)}% Wachstum`;
+                document.getElementById('year-growth-percent').innerText = `${delta >= 0 ? '+' : ''}${startA > 0 ? Math.round((delta/startA)*100) : 0}% Wachstum YTD`;
 
                 const ctx = document.getElementById('year-chart')?.getContext('2d');
                 if(ctx) {
