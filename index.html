@@ -143,6 +143,11 @@
         .nav-btn-inactive:hover {
             background-color: rgba(203, 213, 225, 0.8);
         }
+
+        /* Tooltip Helper */
+        .tooltip-icon {
+            @apply inline-flex items-center justify-center w-3.5 h-3.5 ml-1 text-[8px] border border-current rounded-full opacity-40 hover:opacity-100 cursor-help;
+        }
     </style>
 </head>
 <body class="light">
@@ -187,7 +192,7 @@
             </div>
         </div>
         <div class="live-wealth-header w-full py-1 text-center">
-            <span class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">
+            <span class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80" title="Basierend auf dem aktuellsten Net Worth über alle Monate hinweg.">
                 Letzter Net Worth: <span id="header-wealth-val" class="text-blue-600">0 €</span> 
                 <span class="mx-3 opacity-30">|</span> 
                 <span id="header-date" class="opacity-60">--.--.----</span>
@@ -198,35 +203,35 @@
     <!-- KPI BAR (Global) -->
     <div class="max-w-[2400px] mx-auto px-4 md:px-8 pt-8">
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            <div class="liquid-glass p-6 border-l-4 border-l-blue-600">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Net Worth</p>
+            <div class="liquid-glass p-6 border-l-4 border-l-blue-600" title="Dein gesamter Bestand (Assets) in diesem Monat.">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Net Worth <span class="tooltip-icon">?</span></p>
                 <h2 id="kpi-wealth" class="text-2xl font-black tabular-nums">0 €</h2>
                 <p id="kpi-btc" class="text-[10px] font-bold text-orange-500 mt-1 uppercase">₿ 0 BTC</p>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-emerald-600">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-emerald-600">Cashflow</p>
+            <div class="liquid-glass p-6 border-l-4 border-l-emerald-600" title="Dein monatlicher Überschuss (Einnahmen minus Ausgaben).">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-emerald-600">Cashflow <span class="tooltip-icon">?</span></p>
                 <h2 id="kpi-cashflow" class="text-2xl font-black tabular-nums">0 €</h2>
                 <div id="kpi-savings-rate" class="text-[11px] font-bold text-emerald-500 mt-1 uppercase font-black">Sparrate: 0%</div>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-blue-400">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Restbudget</p>
+            <div class="liquid-glass p-6 border-l-4 border-l-blue-400" title="Geld, das nach Ausgaben und geplanten Investments noch übrig ist.">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Restbudget <span class="tooltip-icon">?</span></p>
                 <h2 id="kpi-remaining" class="text-2xl font-black tabular-nums">0 €</h2>
                 <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 mt-2 rounded-full overflow-hidden">
                     <div id="savings-progress" class="bg-blue-500 h-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-orange-500">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-orange-500">Notgroschen</p>
+            <div class="liquid-glass p-6 border-l-4 border-l-orange-500" title="Verhältnis deines Cash-Bestands zu deinem Sicherheitsziel (Monatsausgaben).">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-orange-500">Notgroschen <span class="tooltip-icon">?</span></p>
                 <h2 id="kpi-emergency" class="text-2xl font-black tabular-nums">0%</h2>
                 <p id="kpi-emergency-months" class="text-[11px] font-bold opacity-40 mt-1 uppercase font-black">0.0 Monate</p>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-indigo-600">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-indigo-500">FIRE Roadmap</p>
+            <div class="liquid-glass p-6 border-l-4 border-l-indigo-600" title="Geschätzte Jahre bis zum FIRE-Ziel bei aktueller Sparrate und Rendite.">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-indigo-500">FIRE Roadmap <span class="tooltip-icon">?</span></p>
                 <h2 id="kpi-fire" class="text-2xl font-black tabular-nums">-- J.</h2>
                 <p id="ui-fire-target-info" class="text-[11px] font-bold opacity-40 mt-1 uppercase font-black">Ziel: 1M €</p>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-slate-400">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-slate-500">Runway</p>
+            <div class="liquid-glass p-6 border-l-4 border-l-slate-400" title="Wie viele Monate du ohne Einkommen von deinem Net Worth leben könntest.">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-slate-500">Runway <span class="tooltip-icon">?</span></p>
                 <h2 id="kpi-runway" class="text-2xl font-black tabular-nums">0 M.</h2>
                 <p class="text-[11px] font-bold opacity-40 mt-1 uppercase font-black">Survival Mode</p>
             </div>
@@ -238,8 +243,14 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 4xl:grid-cols-4 gap-8 items-start">
             <!-- Income -->
             <div class="liquid-glass overflow-hidden h-full">
-                <div onclick="app.toggleCollapse('col-income', 'chevron-income')" class="p-6 bg-slate-100 dark:bg-slate-800/40 cursor-pointer flex justify-between items-center group">
-                    <div><h3 class="text-xs font-black uppercase leading-none">Einnahmen</h3><span id="sum-income" class="text-[13px] font-bold text-blue-600">0 €</span></div>
+                <div onclick="app.toggleCollapse('col-income', 'chevron-income')" class="p-6 bg-slate-100 dark:bg-slate-800/40 cursor-pointer flex justify-between items-center group" title="Alle Zuflüsse in diesem Monat. Basis (100%) für Cashflow-Analysen.">
+                    <div>
+                        <h3 class="text-xs font-black uppercase leading-none">Einnahmen <span class="tooltip-icon">?</span></h3>
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <span id="sum-income" class="text-[13px] font-bold text-blue-600">0 €</span>
+                            <span class="text-[9px] font-black opacity-40 uppercase">100% Base</span>
+                        </div>
+                    </div>
                     <div class="flex items-center gap-2">
                         <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('income')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-blue-500 hover:text-white transition-all">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('income')" class="w-8 h-8 bg-black dark:bg-white text-white dark:text-black font-black rounded-lg text-xs">+</button>
@@ -252,8 +263,14 @@
             </div>
             <!-- Expenses -->
             <div class="liquid-glass overflow-hidden h-full">
-                <div onclick="app.toggleCollapse('col-expenses', 'chevron-expenses')" class="p-6 bg-red-50/50 dark:bg-red-900/10 cursor-pointer flex justify-between items-center group">
-                    <div><h3 class="text-xs font-black uppercase text-red-600 leading-none">Ausgaben</h3><span id="sum-expenses" class="text-[13px] font-bold text-red-500">0 €</span></div>
+                <div onclick="app.toggleCollapse('col-expenses', 'chevron-expenses')" class="p-6 bg-red-50/50 dark:bg-red-900/10 cursor-pointer flex justify-between items-center group" title="Deine monatlichen Abflüsse. Der Prozentsatz zeigt den Anteil am Gesamteinkommen.">
+                    <div>
+                        <h3 class="text-xs font-black uppercase text-red-600 leading-none">Ausgaben <span class="tooltip-icon">?</span></h3>
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <span id="sum-expenses" class="text-[13px] font-bold text-red-500">0 €</span>
+                            <span id="ratio-expenses" class="text-[9px] font-black opacity-40 uppercase">0% of Inc</span>
+                        </div>
+                    </div>
                     <div class="flex items-center gap-2">
                         <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('expenses')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-red-500 hover:text-white transition-all">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('expenses')" class="w-8 h-8 bg-red-600 text-white font-black rounded-lg text-xs">+</button>
@@ -266,8 +283,14 @@
             </div>
             <!-- Invest -->
             <div class="liquid-glass overflow-hidden h-full">
-                <div onclick="app.toggleCollapse('col-invest', 'chevron-invest')" class="p-6 bg-emerald-50/50 dark:bg-emerald-900/10 cursor-pointer flex justify-between items-center group">
-                    <div><h3 class="text-xs font-black uppercase text-emerald-600 leading-none">Investments</h3><span id="sum-invest" class="text-[13px] font-bold text-emerald-500">0 €</span></div>
+                <div onclick="app.toggleCollapse('col-invest', 'chevron-invest')" class="p-6 bg-emerald-50/50 dark:bg-emerald-900/10 cursor-pointer flex justify-between items-center group" title="Aktive Sparraten. Der Prozentsatz zeigt deine Sparquote bezogen auf das Einkommen.">
+                    <div>
+                        <h3 class="text-xs font-black uppercase text-emerald-600 leading-none">Investments <span class="tooltip-icon">?</span></h3>
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <span id="sum-invest" class="text-[13px] font-bold text-emerald-500">0 €</span>
+                            <span id="ratio-invest" class="text-[9px] font-black opacity-40 uppercase">0% Rate</span>
+                        </div>
+                    </div>
                     <div class="flex items-center gap-2">
                         <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('invest')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-emerald-500 hover:text-white transition-all">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('invest')" class="w-8 h-8 bg-emerald-600 text-white font-black rounded-lg text-xs">+</button>
@@ -280,8 +303,14 @@
             </div>
             <!-- Assets -->
             <div class="liquid-glass overflow-hidden h-full">
-                <div onclick="app.toggleCollapse('col-assets', 'chevron-assets')" class="p-6 bg-blue-50/50 dark:bg-blue-900/10 cursor-pointer flex justify-between items-center group">
-                    <div><h3 class="text-xs font-black uppercase text-blue-600 leading-none">Bestand (Assets)</h3><span id="sum-assets" class="text-[13px] font-bold text-blue-500">0 €</span></div>
+                <div onclick="app.toggleCollapse('col-assets', 'chevron-assets')" class="p-6 bg-blue-50/50 dark:bg-blue-900/10 cursor-pointer flex justify-between items-center group" title="Dein aktueller Vermögensstand am Ende des Monats.">
+                    <div>
+                        <h3 class="text-xs font-black uppercase text-blue-600 leading-none">Bestand (Assets) <span class="tooltip-icon">?</span></h3>
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <span id="sum-assets" class="text-[13px] font-bold text-blue-500">0 €</span>
+                            <span class="text-[9px] font-black opacity-40 uppercase">Net Worth</span>
+                        </div>
+                    </div>
                     <div class="flex items-center gap-2">
                         <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('assets')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-blue-500 hover:text-white transition-all">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('assets')" class="w-8 h-8 bg-blue-600 text-white font-black rounded-lg text-xs">+</button>
@@ -424,10 +453,27 @@
                 const y = this.state.year.toString();
                 if(!this.state.db[y]) {
                     this.state.db[y] = Array(12).fill(null).map(() => ({
-                        income: [{name:'Gehalt',val:0,recurring:true}],
-                        expenses: [{name:'Fixkosten',val:0,recurring:true}],
-                        invest: [{name:'ETF',val:0,recurring:true}],
-                        assets: [{name:'Cash',val:0,recurring:true}]
+                        income: [
+                            {name:'Gehalt',val:0,recurring:true},
+                            {name:'Nebenjob',val:0,recurring:true},
+                            {name:'Zinsen',val:0,recurring:true}
+                        ],
+                        expenses: [
+                            {name:'Haus/Miete',val:0,recurring:true},
+                            {name:'Fixkosten',val:0,recurring:true},
+                            {name:'Lebensmittel',val:0,recurring:true}
+                        ],
+                        invest: [
+                            {name:'ETF',val:0,recurring:true},
+                            {name:'Krypto',val:0,recurring:true},
+                            {name:'Edelmetalle',val:0,recurring:true}
+                        ],
+                        assets: [
+                            {name:'Cash',val:0,recurring:true},
+                            {name:'Depot',val:0,recurring:true},
+                            {name:'Wallet',val:0,recurring:true},
+                            {name:'Tresor',val:0,recurring:true}
+                        ]
                     }));
                 }
             },
@@ -534,6 +580,13 @@
                 setVal('sum-assets', this.format(tAss));
                 setVal('kpi-wealth', this.format(tAss));
                 setVal('kpi-cashflow', this.format(tInc - tExp));
+
+                // Dependent Ratios
+                const expRatio = tInc > 0 ? Math.round((tExp / tInc) * 100) : 0;
+                const invRatio = tInc > 0 ? Math.round((tInv / tInc) * 100) : 0;
+                const setRatio = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
+                setRatio('ratio-expenses', `${expRatio}% of Inc`);
+                setRatio('ratio-invest', `${invRatio}% Rate`);
                 
                 const rate = tInc > 0 ? Math.round((tInv / tInc) * 100) : 0;
                 setVal('kpi-savings-rate', `Sparrate: ${rate}%`);
