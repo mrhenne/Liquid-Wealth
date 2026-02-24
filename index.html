@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquid Wealth Tactical | Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-page: #ffffff;
+            --bg-card: #f1f5f9;
+            --text-main: #000000;
+            --text-muted: #475569;
+            --accent: #2563eb;
+            --border: #e2e8f0;
+        }
+
+        .dark {
+            --bg-page: #020617;
+            --bg-card: #0f172a;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --border: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            transition: background-color 0.2s ease;
+        }
+
+        .tactical-card {
+            background-color: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .header-solid {
+            background-color: var(--bg-page);
+            border-bottom: 4px solid var(--accent);
+        }
+
+        input, select {
+            background-color: var(--bg-page) !important;
+            border: 2px solid var(--border) !important;
+            color: var(--text-main) !important;
+            font-weight: 700 !important;
+            border-radius: 0.5rem;
+            padding: 0.6rem 1rem;
+        }
+
+        input:focus {
+            border-color: var(--accent) !important;
+            outline: none;
+        }
+
+        .btn-action {
+            background-color: var(--accent);
+            color: white;
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: transform 0.1s;
+        }
+
+        .btn-action:active { transform: scale(0.96); }
+
+        .suggestion-chip {
+            background-color: var(--border);
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.25rem 0.6rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion-chip:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .breathe {
+            animation: breathe-border 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe-border {
+            0%, 100% { border-color: var(--border); }
+            50% { border-color: var(--accent); }
+        }
+
+        /* High Contrast for Navbar */
+        #nav-main {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="light">
+
+    <!-- Navigation -->
+    <nav id="nav-main" class="header-solid p-4 md:p-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="bg-black text-white dark:bg-white dark:text-black w-12 h-12 flex items-center justify-center rounded font-black text-2xl">LW</div>
+                <div>
+                    <h1 class="text-3xl font-black tracking-tighter uppercase leading-none">Liquid Wealth</h1>
+                    <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mt-1">Tactical Command Center</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 bg-slate-100 dark:bg-slate-800 p-2 rounded-lg border-2 border-slate-200 dark:border-slate-700">
+                <select id="ui-year" onchange="app.changeDate()" class="text-sm"></select>
+                <select id="ui-month" onchange="app.changeDate()" class="text-sm">
+                    <option value="0">JANUAR</option><option value="1">FEBRUAR</option>
+                    <option value="2">MÄRZ</option><option value="3">APRIL</option>
+                    <option value="4">MAI</option><option value="5">JUNI</option>
+                    <option value="6">JULI</option><option value="7">AUGUST</option>
+                    <option value="8">SEPTEMBER</option><option value="9">OKTOBER</option>
+                    <option value="10">NOVEMBER</option><option value="11">DEZEMBER</option>
+                </select>
+                <button onclick="app.toggleTheme()" class="px-3 py-1 font-black">🌓</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+        
+        <!-- Top KPIs -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="tactical-card border-l-8 border-black dark:border-white breathe">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Net Worth</p>
+                <h2 id="kpi-wealth" class="text-4xl font-black tabular-nums">0 €</h2>
+                <p id="kpi-btc" class="text-[10px] font-bold text-orange-500 mt-1 uppercase tracking-tighter">₿ 0.00000000 BTC</p>
+            </div>
+            <div class="tactical-card border-l-8 border-blue-600">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Monats-Cashflow</p>
+                <h2 id="kpi-cashflow" class="text-4xl font-black tabular-nums">0 €</h2>
+                <div id="kpi-savings" class="text-[10px] font-bold text-blue-600 mt-1 uppercase">Quote: 0%</div>
+            </div>
+            <div class="tactical-card border-l-8 border-emerald-500">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Finanzielle Freiheit</p>
+                <h2 id="kpi-fire" class="text-4xl font-black tabular-nums">-- J.</h2>
+                <div class="w-full bg-slate-200 dark:bg-slate-800 h-1 mt-2">
+                    <div id="fire-progress" class="bg-emerald-500 h-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="tactical-card border-l-8 border-red-500">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Financial Runway</p>
+                <h2 id="kpi-runway" class="text-4xl font-black tabular-nums">0 M.</h2>
+                <p class="text-[10px] font-bold opacity-40 mt-1 uppercase">Ohne Einkommen</p>
+            </div>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- INCOME -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-black uppercase">Einnahmen</h3>
+                    <button onclick="app.add('income')" class="w-8 h-8 bg-black dark:bg-white text-white dark:text-black font-black rounded-full">+</button>
+                </div>
+                <div class="flex flex-wrap gap-2 mb-2">
+                    <span class="suggestion-chip" onclick="app.quickAdd('income', 'Gehalt Helios', 3200)">Gehalt Helios</span>
+                    <span class="suggestion-chip" onclick="app.quickAdd('income', 'Testsieger-TV', 450)">Testsieger-TV</span>
+                    <span class="suggestion-chip" onclick="app.quickAdd('income', 'Krypto Staking', 50)">Staking</span>
+                </div>
+                <div id="list-income" class="space-y-2"></div>
+            </div>
+
+            <!-- EXPENSES -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-black uppercase text-red-600">Ausgaben</h3>
+                    <button onclick="app.add('expenses')" class="w-8 h-8 bg-red-600 text-white font-black rounded-full">+</button>
+                </div>
+                <div class="flex flex-wrap gap-2 mb-2">
+                    <span class="suggestion-chip" onclick="app.quickAdd('expenses', 'Miete/Wohnen', 900)">Miete</span>
+                    <span class="suggestion-chip" onclick="app.quickAdd('expenses', 'Krypto Nachkauf', 500)">BTC DCA</span>
+                    <span class="suggestion-chip" onclick="app.quickAdd('expenses', 'Streaming Abos', 45)">Abos</span>
+                </div>
+                <div id="list-expenses" class="space-y-2"></div>
+            </div>
+
+            <!-- ASSETS -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-black uppercase text-blue-600">Assets</h3>
+                    <button onclick="app.add('assets')" class="w-8 h-8 bg-blue-600 text-white font-black rounded-full">+</button>
+                </div>
+                <div class="flex flex-wrap gap-2 mb-2">
+                    <span class="suggestion-chip" onclick="app.quickAdd('assets', 'Bitcoin Cold Storage', 50000)">Bitcoin</span>
+                    <span class="suggestion-chip" onclick="app.quickAdd('assets', 'Welt ETF Portfolio', 12000)">ETF</span>
+                    <span class="suggestion-chip" onclick="app.quickAdd('assets', 'Notgroschen', 5000)">Cash</span>
+                </div>
+                <div id="list-assets" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- Charts & Simulation -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8 tactical-card">
+                <h3 class="text-lg font-black uppercase mb-6">Net Worth Timeline</h3>
+                <div class="h-[300px]">
+                    <canvas id="chart-history"></canvas>
+                </div>
+            </div>
+            <div class="lg:col-span-4 tactical-card space-y-6">
+                <h3 class="text-lg font-black uppercase mb-4">Einstellungen</h3>
+                <div>
+                    <label class="text-[10px] font-black uppercase opacity-60">BTC Kurs (€)</label>
+                    <input type="number" id="cfg-btc" value="95000" onchange="app.render()" class="w-full mt-1">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase opacity-60">Ziel-Vermögen (€)</label>
+                    <input type="number" id="cfg-target" value="1000000" onchange="app.render()" class="w-full mt-1">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase opacity-60">Rendite Szenario (%)</label>
+                    <div class="flex items-center gap-4 mt-1">
+                        <input type="range" id="cfg-roi" min="1" max="15" value="7" oninput="app.render()" class="flex-1">
+                        <span id="ui-roi" class="font-black text-blue-600">7%</span>
+                    </div>
+                </div>
+                <button onclick="app.export()" class="w-full bg-slate-900 text-white dark:bg-white dark:text-black py-3 rounded font-black text-xs uppercase">Daten sichern (JSON)</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        /**
+         * LIQUID WEALTH TACTICAL CORE
+         */
+        const app = {
+            state: {
+                year: 2025,
+                month: new Date().getMonth(),
+                theme: 'light',
+                db: {}
+            },
+            chart: null,
+
+            init() {
+                const saved = localStorage.getItem('lw_tactical_v7');
+                if (saved) this.state = JSON.parse(saved);
+
+                // Year Selector
+                const yp = document.getElementById('ui-year');
+                for(let i=2024; i<=2030; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i; opt.innerText = i;
+                    if(i === this.state.year) opt.selected = true;
+                    yp.appendChild(opt);
+                }
+                document.getElementById('ui-month').value = this.state.month;
+
+                this.checkDB();
+                this.applyTheme();
+                this.render();
+            },
+
+            checkDB() {
+                const y = this.state.year.toString();
+                if(!this.state.db[y]) {
+                    this.state.db[y] = Array(12).fill(null).map(() => ({
+                        income: [], expenses: [], assets: []
+                    }));
+                }
+            },
+
+            render() {
+                const data = this.state.db[this.state.year][this.state.month];
+                
+                this.renderList('income', data.income);
+                this.renderList('expenses', data.expenses);
+                this.renderList('assets', data.assets);
+
+                this.calc();
+                this.updateChart();
+                this.save();
+            },
+
+            renderList(type, items) {
+                const container = document.getElementById(`list-${type}`);
+                container.innerHTML = '';
+                items.forEach((item, idx) => {
+                    const div = document.createElement('div');
+                    div.className = "flex gap-2 items-center mb-2";
+                    div.innerHTML = `
+                        <input type="text" value="${item.name}" onchange="app.updateItem('${type}', ${idx}, 'name', this.value)" class="flex-1 text-sm">
+                        <input type="number" value="${item.val}" onchange="app.updateItem('${type}', ${idx}, 'val', this.value)" class="w-24 text-right text-sm">
+                        <button onclick="app.remove('${type}', ${idx})" class="text-red-500 font-bold px-2">✕</button>
+                    `;
+                    container.appendChild(div);
+                });
+            },
+
+            updateItem(type, idx, field, val) {
+                const item = this.state.db[this.state.year][this.state.month][type][idx];
+                item[field] = field === 'val' ? parseFloat(val) || 0 : val;
+                this.render();
+            },
+
+            add(type) {
+                this.state.db[this.state.year][this.state.month][type].push({ name: 'Neu...', val: 0 });
+                this.render();
+            },
+
+            quickAdd(type, name, val) {
+                const current = this.state.db[this.state.year][this.state.month][type];
+                if(!current.find(i => i.name === name)) {
+                    current.push({ name, val });
+                    this.render();
+                }
+            },
+
+            remove(type, idx) {
+                this.state.db[this.state.year][this.state.month][type].splice(idx, 1);
+                this.render();
+            },
+
+            calc() {
+                const data = this.state.db[this.state.year][this.state.month];
+                const inc = data.income.reduce((s, i) => s + i.val, 0);
+                const exp = data.expenses.reduce((s, i) => s + i.val, 0);
+                const wealth = data.assets.reduce((s, i) => s + i.val, 0);
+                const btcPrice = parseFloat(document.getElementById('cfg-btc').value) || 1;
+                const roi = parseFloat(document.getElementById('cfg-roi').value);
+                const target = parseFloat(document.getElementById('cfg-target').value);
+
+                document.getElementById('ui-roi').innerText = roi + '%';
+                document.getElementById('kpi-wealth').innerText = this.format(wealth);
+                document.getElementById('kpi-btc').innerText = `₿ ${(wealth / btcPrice).toFixed(8)} BTC`;
+                document.getElementById('kpi-cashflow').innerText = this.format(inc - exp);
+                
+                const rate = inc > 0 ? Math.round(((inc - exp) / inc) * 100) : 0;
+                document.getElementById('kpi-savings').innerText = `Quote: ${rate}%`;
+
+                // Runway
+                const runway = exp > 0 ? Math.floor(wealth / exp) : 0;
+                document.getElementById('kpi-runway').innerText = runway + " M.";
+
+                // FIRE
+                if(wealth >= target) {
+                    document.getElementById('kpi-fire').innerText = "JETZT";
+                } else {
+                    const monthlySave = inc - exp;
+                    if(monthlySave <= 0) {
+                        document.getElementById('kpi-fire').innerText = "∞ J.";
+                    } else {
+                        let y = 0; let w = wealth;
+                        while(w < target && y < 100) {
+                            w = (w * (1 + roi/100)) + (monthlySave * 12);
+                            y++;
+                        }
+                        document.getElementById('kpi-fire').innerText = y + " J.";
+                    }
+                }
+                document.getElementById('fire-progress').style.width = Math.min((wealth / target) * 100, 100) + '%';
+            },
+
+            updateChart() {
+                const ctx = document.getElementById('chart-history').getContext('2d');
+                const yearData = this.state.db[this.state.year];
+                const labels = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+                const dataPoints = yearData.map(m => m.assets.reduce((s, i) => s + i.val, 0));
+
+                if(this.chart) this.chart.destroy();
+                this.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data: dataPoints,
+                            borderColor: '#2563eb',
+                            borderWidth: 6,
+                            tension: 0.2,
+                            fill: true,
+                            backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                            pointRadius: 5,
+                            pointBackgroundColor: '#2563eb'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { display: false },
+                            x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+                        }
+                    }
+                });
+            },
+
+            changeDate() {
+                this.state.year = parseInt(document.getElementById('ui-year').value);
+                this.state.month = parseInt(document.getElementById('ui-month').value);
+                this.checkDB();
+                this.render();
+            },
+
+            toggleTheme() {
+                this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
+                this.applyTheme();
+                this.save();
+            },
+
+            applyTheme() {
+                document.body.className = this.state.theme;
+            },
+
+            save() {
+                localStorage.setItem('lw_tactical_v7', JSON.stringify(this.state));
+            },
+
+            export() {
+                const blob = new Blob([JSON.stringify(this.state)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `lw_tactical_backup_${this.state.year}.json`;
+                a.click();
+            },
+
+            format(v) {
+                return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v);
+            }
+        };
+
+        window.onload = () => app.init();
+    </script>
+</body>
+</html>
