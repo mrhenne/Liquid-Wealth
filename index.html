@@ -298,10 +298,10 @@
     <!-- ANALYTICS VIEW -->
     <main id="view-analytics" class="max-w-[2400px] mx-auto p-4 md:p-8 space-y-8 hidden-view">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="liquid-glass p-6"><h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-blue-600 text-center">Einnahmen-Mix</h3><div class="h-[250px]"><canvas id="chart-deep-income"></canvas></div></div>
-            <div class="liquid-glass p-6"><h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-red-500 text-center">Ausgaben-Mix</h3><div class="h-[250px]"><canvas id="chart-deep-expenses"></canvas></div></div>
-            <div class="liquid-glass p-6"><h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-emerald-500 text-center">Investment-Mix</h3><div class="h-[250px]"><canvas id="chart-deep-invest"></canvas></div></div>
-            <div class="liquid-glass p-6"><h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-indigo-500 text-center">Asset-Mix</h3><div class="h-[250px]"><canvas id="chart-deep-assets"></canvas></div></div>
+            <div class="liquid-glass p-6"><h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-blue-600 text-center">Einnahmen-Mix</h3><div class="h-[300px]"><canvas id="chart-deep-income"></canvas></div></div>
+            <div class="liquid-glass p-6"><h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-red-500 text-center">Ausgaben-Mix</h3><div class="h-[300px]"><canvas id="chart-deep-expenses"></canvas></div></div>
+            <div class="liquid-glass p-6"><h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-emerald-500 text-center">Investment-Mix</h3><div class="h-[300px]"><canvas id="chart-deep-invest"></canvas></div></div>
+            <div class="liquid-glass p-6"><h3 class="text-[10px] font-black uppercase mb-6 opacity-60 text-indigo-500 text-center">Asset-Mix</h3><div class="h-[300px]"><canvas id="chart-deep-assets"></canvas></div></div>
         </div>
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
             <div class="xl:col-span-8 liquid-glass p-8">
@@ -381,7 +381,6 @@
                     this.state.theme = loaded.theme || 'light';
                 }
 
-                // Month Nav Generation
                 const mNav = document.getElementById('month-nav');
                 const months = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
                 months.forEach((m, i) => {
@@ -392,7 +391,6 @@
                     mNav.appendChild(chip);
                 });
 
-                // Year select
                 const yp = document.getElementById('ui-year');
                 for(let i=2024; i<=2035; i++) {
                     const opt = document.createElement('option');
@@ -516,10 +514,10 @@
                         if(total > 0) { latest = total; const ld = new Date(y, m+1, 0); dStr = ld.toLocaleDateString('de-DE'); break outer; }
                     }
                 }
-                const headerWealth = document.getElementById('header-wealth-val');
-                const headerDate = document.getElementById('header-date');
-                if(headerWealth) headerWealth.innerText = this.format(latest);
-                if(headerDate) headerDate.innerText = dStr;
+                const hwv = document.getElementById('header-wealth-val');
+                const hd = document.getElementById('header-date');
+                if(hwv) hwv.innerText = this.format(latest);
+                if(hd) hd.innerText = dStr;
             },
 
             calc() {
@@ -572,6 +570,34 @@
                 if (this.state.view !== 'analytics') return;
 
                 const data = this.state.db[this.state.year][this.state.month];
+                
+                const tInc = data.income.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
+                const tExp = data.expenses.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
+                const tInv = data.invest.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
+
+                const getDonutOptions = (showLegend = true) => ({
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { 
+                            display: showLegend, 
+                            position: 'bottom',
+                            labels: { color: this.state.theme === 'dark' ? '#cbd5e1' : '#1e293b', font: { size: 9, weight: 'bold' }, padding: 15, boxWidth: 8, usePointStyle: true } 
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
+                                    const val = ctx.raw;
+                                    const perc = Math.round((val/total)*100);
+                                    return ` ${ctx.label}: ${app.format(val)} (${perc}%)`;
+                                }
+                            }
+                        }
+                    }
+                });
+
                 const updateDonut = (key, items, colors) => {
                     const canvas = document.getElementById(`chart-${key.replace('deep', 'deep-').toLowerCase()}`);
                     if(!canvas) return;
@@ -581,31 +607,50 @@
                     this.charts[key] = new Chart(ctx, {
                         type: 'doughnut',
                         data: { labels: active.map(i=>i.name), datasets:[{ data: active.map(i=>i.val), backgroundColor: colors, borderWidth: 0 }] },
-                        options: { responsive: true, maintainAspectRatio: false, cutout:'75%', plugins: { legend: { display: false } } }
+                        options: getDonutOptions(true)
                     });
                 };
 
-                updateDonut('deepIncome', data.income, ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd']);
-                updateDonut('deepExpenses', data.expenses, ['#ef4444', '#f87171', '#fb923c', '#fdba74']);
-                updateDonut('deepInvest', data.invest, ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0']);
-                updateDonut('deepAssets', data.assets, ['#4f46e5', '#6366f1', '#818cf8', '#a5b4fc']);
+                updateDonut('deepIncome', data.income, ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe']);
+                updateDonut('deepExpenses', data.expenses, ['#ef4444', '#f87171', '#fb923c', '#fdba74', '#ffedd5']);
+                updateDonut('deepInvest', data.invest, ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5']);
+                updateDonut('deepAssets', data.assets, ['#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe']);
+
+                // Comparison Chart (Gesamt-Zuweisung)
+                const compCanvas = document.getElementById('chart-comparison');
+                if(compCanvas) {
+                    const ctx = compCanvas.getContext('2d');
+                    if(this.charts.comparison) this.charts.comparison.destroy();
+                    const rest = Math.max(0, tInc - tExp - tInv);
+                    this.charts.comparison = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: { 
+                            labels: ['Ausgaben', 'Investments', 'Puffer'], 
+                            datasets: [{ 
+                                data: [tExp, tInv, rest], 
+                                backgroundColor: ['#ef4444', '#10b981', '#3b82f6'], 
+                                borderWidth: 0 
+                            }] 
+                        },
+                        options: getDonutOptions(true)
+                    });
+                }
 
                 // History Line
                 const yearData = this.state.db[this.state.year];
                 const labels = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
-                let pts = []; let label = ""; let col = "#2563eb";
-                if(mode === 'wealth') { pts = yearData.map(m=>m.assets.filter(a=>a.recurring).reduce((s,i)=>s+i.val,0)); label="Wealth"; }
-                else if(mode === 'cashflow') { pts = yearData.map(m=>{ const i=m.income.filter(x=>x.recurring).reduce((s,v)=>s+v.val,0); const e=m.expenses.filter(x=>x.recurring).reduce((s,v)=>s+v.val,0); return i-e; }); label="Cashflow"; col="#10b981"; }
-                else if(mode === 'income') { pts = yearData.map(m=>m.income.filter(a=>a.recurring).reduce((s,i)=>s+i.val,0)); label="Income"; col="#3b82f6"; }
-                else { pts = yearData.map(m=>m.expenses.filter(a=>a.recurring).reduce((s,i)=>s+i.val,0)); label="Expenses"; col="#ef4444"; }
+                let pts = []; let lbl = ""; let col = "#2563eb";
+                if(mode === 'wealth') { pts = yearData.map(m=>m.assets.filter(a=>a.recurring).reduce((s,i)=>s+i.val,0)); lbl="Wealth"; }
+                else if(mode === 'cashflow') { pts = yearData.map(m=>{ const i=m.income.filter(x=>x.recurring).reduce((s,v)=>s+v.val,0); const e=m.expenses.filter(x=>x.recurring).reduce((s,v)=>s+v.val,0); return i-e; }); lbl="Cashflow"; col="#10b981"; }
+                else if(mode === 'income') { pts = yearData.map(m=>m.income.filter(a=>a.recurring).reduce((s,i)=>s+i.val,0)); lbl="Income"; col="#3b82f6"; }
+                else { pts = yearData.map(m=>m.expenses.filter(a=>a.recurring).reduce((s,i)=>s+i.val,0)); lbl="Expenses"; col="#ef4444"; }
 
                 const histCanvas = document.getElementById('chart-history');
                 if(histCanvas) {
-                    const histCtx = histCanvas.getContext('2d');
                     if(this.charts.history) this.charts.history.destroy();
-                    this.charts.history = new Chart(histCtx, {
+                    this.charts.history = new Chart(histCanvas.getContext('2d'), {
                         type: 'line',
-                        data: { labels, datasets:[{ label, data: pts, borderColor: col, borderWidth: 5, tension: 0.4, fill: true, backgroundColor: col+'11' }] },
+                        data: { labels, datasets:[{ label: lbl, data: pts, borderColor: col, borderWidth: 5, tension: 0.4, fill: true, backgroundColor: col+'11' }] },
                         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false, beginAtZero: false } } }
                     });
                 }
