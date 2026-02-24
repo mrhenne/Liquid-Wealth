@@ -43,10 +43,10 @@
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Ticker Animation - Even Slower for better readability */
+        /* Ticker Animation - Ultra Slower as requested */
         @keyframes scroll {
-            0% { transform: translateX(90%); }
-            100% { transform: translateX(-180%); }
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-250%); }
         }
         .ticker-wrap {
             overflow: hidden;
@@ -58,13 +58,13 @@
         }
         .ticker-move {
             display: inline-block;
-            animation: scroll 100s linear infinite;
+            animation: scroll 120s linear infinite;
             font-weight: 800;
             font-size: 13px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
         }
-        .ticker-item { display: inline-block; margin-right: 60px; }
+        .ticker-item { display: inline-block; margin-right: 80px; }
 
         .header-solid {
             background-color: var(--bg-page);
@@ -88,7 +88,6 @@
             50% { border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); }
         }
 
-        /* Fixed Collapsible Logic */
         .collapse-content {
             display: none;
             overflow: hidden;
@@ -101,16 +100,11 @@
 
         .hidden-view { display: none !important; }
         
-        /* Drag & Drop Styles */
         .dragging {
             opacity: 0.5;
             background: var(--accent-glow) !important;
         }
         
-        .drop-target {
-            border-top: 2px solid var(--accent) !important;
-        }
-
         .item-row {
             transition: all 0.2s ease;
             cursor: grab;
@@ -139,7 +133,7 @@
     <!-- Crypto Ticker -->
     <div class="ticker-wrap w-full">
         <div id="crypto-ticker" class="ticker-move">
-            Warten auf Blockchain-Feed... ₿... ETH... SOL... LINK... DOT... MATIC...
+            Warten auf Blockchain-Feed... ₿... ETH... SOL... LINK... DOT... MATIC... ADA... XRP...
         </div>
     </div>
 
@@ -157,7 +151,7 @@
             <div class="flex items-center gap-2 bg-slate-200/40 dark:bg-slate-800/40 p-2 rounded-2xl border border-slate-300/50 dark:border-slate-700/50">
                 <button onclick="app.toggleView()" id="view-toggle-btn" class="text-[10px] font-black bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 uppercase">Jahresübersicht</button>
                 <button onclick="app.showSettingsModal()" class="p-2 hover:bg-white/20 rounded-xl transition-all">⚙️</button>
-                <button onclick="app.syncRecurring()" class="text-[10px] font-black bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/20 uppercase">Sync Recurring</button>
+                <button onclick="app.syncRecurring()" class="text-[10px] font-black bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/20 uppercase">Global Sync</button>
                 <button onclick="app.showCopyModal()" class="text-[10px] font-black bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl transition-all shadow-lg shadow-emerald-600/20 uppercase">Kopieren</button>
                 <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
                 <select id="ui-year" onchange="app.changeDate()" class="text-xs bg-transparent border-none py-1"></select>
@@ -211,13 +205,15 @@
             </div>
         </div>
 
-        <!-- Scaling Bento Grid - Ultra Wide Support -->
+        <!-- Scaling Bento Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 4xl:grid-cols-4 gap-8 items-start">
             
+            <!-- Category Boxes -->
             <div class="liquid-glass overflow-hidden h-full">
                 <div onclick="app.toggleCollapse('col-income', 'chevron-income')" class="p-6 bg-slate-100 dark:bg-slate-800/40 cursor-pointer flex justify-between items-center group">
                     <div><h3 class="text-xs font-black uppercase leading-none">Einnahmen</h3><span id="sum-income" class="text-[13px] font-bold text-blue-600">0 €</span></div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('income')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-blue-500 hover:text-white transition-all" title="Vom Vormonat übernehmen">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('income')" class="w-8 h-8 bg-black dark:bg-white text-white dark:text-black font-black rounded-lg text-xs shadow-md hover:scale-110 transition-transform">+</button>
                         <svg id="chevron-income" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
@@ -230,7 +226,8 @@
             <div class="liquid-glass overflow-hidden h-full">
                 <div onclick="app.toggleCollapse('col-expenses', 'chevron-expenses')" class="p-6 bg-red-50/50 dark:bg-red-900/10 cursor-pointer flex justify-between items-center group">
                     <div><h3 class="text-xs font-black uppercase text-red-600 leading-none">Ausgaben</h3><span id="sum-expenses" class="text-[13px] font-bold text-red-500">0 €</span></div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('expenses')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-red-500 hover:text-white transition-all" title="Vom Vormonat übernehmen">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('expenses')" class="w-8 h-8 bg-red-600 text-white font-black rounded-lg text-xs shadow-md hover:scale-110 transition-transform">+</button>
                         <svg id="chevron-expenses" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
@@ -243,7 +240,8 @@
             <div class="liquid-glass overflow-hidden h-full">
                 <div onclick="app.toggleCollapse('col-invest', 'chevron-invest')" class="p-6 bg-emerald-50/50 dark:bg-emerald-900/10 cursor-pointer flex justify-between items-center group">
                     <div><h3 class="text-xs font-black uppercase text-emerald-600 leading-none">Investments</h3><span id="sum-invest" class="text-[13px] font-bold text-emerald-500">0 €</span></div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('invest')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-emerald-500 hover:text-white transition-all" title="Vom Vormonat übernehmen">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('invest')" class="w-8 h-8 bg-emerald-600 text-white font-black rounded-lg text-xs shadow-md hover:scale-110 transition-transform">+</button>
                         <svg id="chevron-invest" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
@@ -256,7 +254,8 @@
             <div class="liquid-glass overflow-hidden h-full">
                 <div onclick="app.toggleCollapse('col-assets', 'chevron-assets')" class="p-6 bg-blue-50/50 dark:bg-blue-900/10 cursor-pointer flex justify-between items-center group">
                     <div><h3 class="text-xs font-black uppercase text-blue-600 leading-none">Bestand (Assets)</h3><span id="sum-assets" class="text-[13px] font-bold text-blue-500">0 €</span></div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <button onclick="event.stopPropagation(); app.syncCategoryFromPrev('assets')" class="p-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-xs hover:bg-blue-500 hover:text-white transition-all" title="Vom Vormonat übernehmen">⏮</button>
                         <button onclick="event.stopPropagation(); app.add('assets')" class="w-8 h-8 bg-blue-600 text-white font-black rounded-lg text-xs shadow-md hover:scale-110 transition-transform">+</button>
                         <svg id="chevron-assets" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
@@ -284,7 +283,6 @@
             </div>
             
             <div class="xl:col-span-4 space-y-8">
-                <!-- Emergency Fund (Compact) -->
                 <div class="liquid-glass p-6 border-l-4 border-l-orange-500">
                     <h3 class="text-[10px] font-black uppercase mb-4 opacity-70">Notgroschen Strategie</h3>
                     <div class="flex items-center justify-between gap-4">
@@ -298,9 +296,8 @@
                         </div>
                     </div>
                 </div>
-                
                 <div class="liquid-glass p-6">
-                    <h3 class="text-[10px] font-black uppercase mb-4 opacity-70 text-indigo-500 text-center">Cash-Effizienz</h3>
+                    <h3 class="text-[10px] font-black uppercase mb-4 opacity-70 text-indigo-500 text-center">Asset Allocation</h3>
                     <div class="h-[230px]"><canvas id="chart-comparison"></canvas></div>
                 </div>
             </div>
@@ -317,28 +314,28 @@
             <div class="liquid-glass p-8 border-l-4 border-l-red-500 stat-card-glow">
                 <p class="text-[11px] font-black opacity-60 uppercase tracking-widest">Ø Ausgaben / Monat</p>
                 <h2 id="year-avg-expenses" class="text-4xl font-black tabular-nums">0 €</h2>
-                <p id="year-burn-rate" class="text-[10px] font-bold mt-2 text-red-500">Burn Rate: 0%</p>
+                <p id="year-burn-rate" class="text-[10px] font-bold mt-2 text-red-500 uppercase tracking-tighter font-black">Burn Rate: 0%</p>
             </div>
             <div class="liquid-glass p-8 border-l-4 border-l-emerald-500 stat-card-glow">
                 <p class="text-[11px] font-black opacity-60 uppercase tracking-widest">Ø Sparrate / Monat</p>
                 <h2 id="year-avg-savings" class="text-4xl font-black tabular-nums">0 €</h2>
-                <p id="year-efficiency" class="text-[10px] font-bold mt-2 text-emerald-500">Efficiency: 0%</p>
+                <p id="year-efficiency" class="text-[10px] font-bold mt-2 text-emerald-500 uppercase tracking-tighter font-black">Efficiency: 0%</p>
             </div>
             <div class="liquid-glass p-8 border-l-4 border-l-indigo-600 stat-card-glow">
                 <p class="text-[11px] font-black opacity-60 uppercase tracking-widest">Wachstum YTD</p>
                 <h2 id="year-wealth-delta" class="text-4xl font-black tabular-nums">0 €</h2>
-                <p id="year-growth-percent" class="text-[10px] font-bold mt-2 text-indigo-500">+0% Wachstum</p>
+                <p id="year-growth-percent" class="text-[10px] font-bold mt-2 text-indigo-500 uppercase tracking-tighter font-black">+0% Wachstum</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8 liquid-glass p-8">
-                <h3 class="text-xs font-black uppercase mb-8">Jahres-Dynamik (Asset Wachstum vs. Cashflow)</h3>
+                <h3 class="text-xs font-black uppercase mb-8">Strategie-Verlauf (Einkommen vs. Ausgaben vs. Net Worth)</h3>
                 <div class="h-[500px]"><canvas id="year-chart"></canvas></div>
             </div>
             <div class="lg:col-span-4 space-y-8">
                 <div class="liquid-glass p-8">
-                    <h3 class="text-xs font-black uppercase mb-6 text-center">Sparraten-Trend (%)</h3>
+                    <h3 class="text-xs font-black uppercase mb-6 text-center">Sparraten-Trend (%) <br> <span class="text-[9px] opacity-40">Basis: Ø-Gehalt</span></h3>
                     <div class="h-[400px]"><canvas id="year-savings-chart"></canvas></div>
                 </div>
             </div>
@@ -348,8 +345,8 @@
     <!-- Modals -->
     <div id="copy-modal" class="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="liquid-glass max-w-sm w-full bg-white/95 dark:bg-slate-900/95 p-8 shadow-2xl">
-            <h3 class="text-lg font-black uppercase mb-2">Daten Kopieren</h3>
-            <p class="text-[11px] font-bold mb-6 opacity-60">Struktur eines Monats übernehmen.</p>
+            <h3 class="text-lg font-black uppercase mb-2">Gesamt-Kopie</h3>
+            <p class="text-[11px] font-bold mb-6 opacity-60">Kompletten Monat überschreiben.</p>
             <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-3">
                     <select id="copy-year" class="w-full text-xs"></select>
@@ -370,14 +367,14 @@
 
     <div id="settings-modal" class="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="liquid-glass max-w-sm w-full bg-white/95 dark:bg-slate-900/95 p-8 shadow-2xl">
-            <h3 class="text-lg font-black uppercase mb-6 text-center">Setup</h3>
+            <h3 class="text-lg font-black uppercase mb-6 text-center">Tactical Setup</h3>
             <div class="space-y-6">
                 <div><label class="text-[11px] font-black uppercase opacity-60">Bitcoin Preis (€)</label><input type="number" id="cfg-btc" value="95000" onchange="app.render()" class="w-full mt-1"></div>
                 <div><label class="text-[11px] font-black uppercase opacity-60">FIRE Ziel (€)</label><input type="number" id="cfg-target" value="1000000" onchange="app.render()" class="w-full mt-1"></div>
                 <div><label class="text-[11px] font-black uppercase opacity-60">Rendite (%)</label><input type="range" id="cfg-roi" min="1" max="15" value="7" oninput="app.render()" class="w-full accent-blue-600"><span id="ui-roi" class="font-black text-blue-600 text-right block">7%</span></div>
                 <div class="flex flex-col gap-2 pt-4">
-                    <button onclick="app.export()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-[11px] uppercase shadow-lg">BACKUP EXPORT</button>
-                    <button onclick="app.hideSettingsModal()" class="w-full py-4 bg-blue-600 text-white font-black text-[11px] rounded-xl">SCHLIESSEN</button>
+                    <button onclick="app.export()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-[11px] uppercase shadow-lg">DATA EXPORT</button>
+                    <button onclick="app.hideSettingsModal()" class="w-full py-4 bg-blue-600 text-white font-black text-[11px] rounded-xl">CLOSE</button>
                 </div>
             </div>
         </div>
@@ -397,7 +394,7 @@
             draggedItem: null,
 
             async init() {
-                const saved = localStorage.getItem('lw_tactical_v12');
+                const saved = localStorage.getItem('lw_tactical_v13');
                 if (saved) {
                     const loaded = JSON.parse(saved);
                     this.state.db = loaded.db || {};
@@ -438,7 +435,7 @@
                     });
                     ticker.innerHTML = html + html;
                 } catch (e) {
-                    ticker.innerText = "Ticker momentan nicht erreichbar.";
+                    ticker.innerText = "BLOCKCHAIN OFFLINE - CHECK API";
                 }
             },
 
@@ -472,7 +469,7 @@
                 container.innerHTML = '';
                 items.forEach((item, idx) => {
                     const div = document.createElement('div');
-                    div.className = `flex gap-2 items-center group item-row p-2 rounded-lg hover:bg-slate-500/5 ${item.recurring ? '' : 'opacity-40'}`;
+                    div.className = `flex gap-2 items-center group item-row p-2 rounded-lg hover:bg-slate-500/5 ${item.recurring ? '' : 'opacity-30'}`;
                     div.draggable = true;
                     div.dataset.index = idx;
                     div.dataset.type = type;
@@ -480,11 +477,14 @@
                     div.ondragstart = (e) => this.handleDragStart(e, type, idx);
                     div.ondragend = (e) => e.target.classList.remove('dragging');
 
+                    // Checkbox logic: For Invest type it confirms if it's a Savings Rate
+                    const checkboxTitle = type === 'invest' ? "Als Sparrate werten & Wiederkehrend" : "Aktivieren & Wiederkehrend";
+
                     div.innerHTML = `
-                        <input type="checkbox" ${item.recurring ? 'checked' : ''} onchange="app.toggleRecurring('${type}', ${idx})" title="Aktivieren & Wiederkehrend" class="w-4 h-4 cursor-pointer accent-blue-600">
+                        <input type="checkbox" ${item.recurring ? 'checked' : ''} onchange="app.toggleRecurring('${type}', ${idx})" title="${checkboxTitle}" class="w-4 h-4 cursor-pointer accent-blue-600">
                         <input type="text" value="${item.name}" onchange="app.updateItem('${type}', ${idx}, 'name', this.value)" class="flex-1 text-[11px] p-2 bg-transparent border-none font-bold">
                         <input type="number" value="${item.val}" onchange="app.updateItem('${type}', ${idx}, 'val', this.value)" class="w-24 text-right text-[11px] p-2 bg-transparent border-none font-black">
-                        <button onclick="app.remove('${type}', ${idx})" class="text-red-500 font-bold px-3 opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
+                        <button onclick="app.remove('${type}', ${idx})" class="text-red-500 font-black px-3 opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
                     `;
                     container.appendChild(div);
                 });
@@ -496,35 +496,24 @@
                 e.dataTransfer.effectAllowed = 'move';
             },
 
-            handleDragOver(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-            },
+            handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; },
 
             handleDrop(e, targetType) {
                 e.preventDefault();
                 if (!this.draggedItem) return;
-                
                 const { type, idx } = this.draggedItem;
                 const sourceList = this.state.db[this.state.year][this.state.month][type];
                 const targetList = this.state.db[this.state.year][this.state.month][targetType];
-                
                 const [item] = sourceList.splice(idx, 1);
-                
-                // Find target index based on mouse position
                 const container = document.getElementById(`list-${targetType}`);
                 const afterElement = Array.from(container.children).find(child => {
                     const box = child.getBoundingClientRect();
                     return e.clientY <= box.top + box.height / 2;
                 });
-                
                 if (afterElement) {
                     const targetIdx = parseInt(afterElement.dataset.index);
                     targetList.splice(targetIdx, 0, item);
-                } else {
-                    targetList.push(item);
-                }
-                
+                } else { targetList.push(item); }
                 this.draggedItem = null;
                 this.render();
             },
@@ -535,36 +524,36 @@
                 this.render();
             },
 
-            syncRecurring() {
+            syncCategoryFromPrev(type) {
                 const currentMonth = this.state.month;
                 const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
                 const prevYear = currentMonth === 0 ? this.state.year - 1 : this.state.year;
-                
                 const prevYearStr = prevYear.toString();
                 if(!this.state.db[prevYearStr] || !this.state.db[prevYearStr][prevMonth]) return;
 
-                const source = this.state.db[prevYearStr][prevMonth];
-                const target = this.state.db[this.state.year][this.state.month];
+                const source = this.state.db[prevYearStr][prevMonth][type];
+                const target = this.state.db[this.state.year][this.state.month][type];
 
-                ['income', 'expenses', 'invest', 'assets'].forEach(type => {
-                    source[type].forEach(item => {
-                        if(item.recurring) {
-                            if(!target[type].find(t => t.name === item.name)) {
-                                target[type].push(JSON.parse(JSON.stringify(item)));
-                            }
-                        }
-                    });
+                source.forEach(item => {
+                    if(!target.find(t => t.name === item.name)) {
+                        target.push(JSON.parse(JSON.stringify(item)));
+                    } else {
+                        // If exists, just update value from previous month for consistency
+                        const existing = target.find(t => t.name === item.name);
+                        existing.val = item.val;
+                    }
                 });
                 this.render();
+            },
+
+            syncRecurring() {
+                ['income', 'expenses', 'invest', 'assets'].forEach(type => this.syncCategoryFromPrev(type));
             },
 
             toggleCollapse(id, chevronId) {
                 const el = document.getElementById(id);
                 const chev = document.getElementById(chevronId);
-                if(el) {
-                    el.classList.toggle('open');
-                    chev.classList.toggle('rotated');
-                }
+                if(el) { el.classList.toggle('open'); chev.classList.toggle('rotated'); }
             },
 
             updateItem(type, idx, field, val) {
@@ -585,18 +574,16 @@
 
             calc() {
                 const data = this.state.db[this.state.year][this.state.month];
-                // Filter items that are active (recurring/checked)
                 const totalInc = data.income.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                 const totalExp = data.expenses.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
+                // Sparrate: Only marked investments + remaining cashflow? No, usually user wants specific flagged invest.
+                // Request says: "Haken der bestätigt dass es eine Sparrate ist"
                 const totalInv = (data.invest || []).filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                 const totalAssets = data.assets.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                 
                 const setVal = (id, val, color) => {
                     const el = document.getElementById(id);
-                    if(el) {
-                        el.innerText = val;
-                        if(color) el.style.color = color;
-                    }
+                    if(el) { el.innerText = val; if(color) el.style.color = color; }
                 };
 
                 setVal('sum-income', this.format(totalInc));
@@ -646,8 +633,6 @@
                     }
                 }
                 setVal('ui-fire-target-info', `Ziel: ${this.format(target)}`);
-                const ur = document.getElementById('ui-roi');
-                if(ur) ur.innerText = roi + '%';
             },
 
             renderYearView() {
@@ -660,22 +645,25 @@
                     const me = m.expenses.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                     const minv = m.invest.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                     const ma = m.assets.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
-
                     incData.push(mi); expData.push(me); assetData.push(ma);
-                    savingsRates.push(mi > 0 ? Math.round((minv / mi) * 100) : 0);
-
                     if(mi > 0 || me > 0) {
                         totalIncome += mi; totalExpenses += me; totalInvest += minv; filledMonths++;
                     }
                 });
 
-                document.getElementById('year-avg-income').innerText = this.format(totalIncome / (filledMonths || 1));
+                const avgInc = totalIncome / (filledMonths || 1);
+                document.getElementById('year-avg-income').innerText = this.format(avgInc);
                 document.getElementById('year-avg-expenses').innerText = this.format(totalExpenses / (filledMonths || 1));
                 document.getElementById('year-avg-savings').innerText = this.format(totalInvest / (filledMonths || 1));
                 
+                // Calculate savings trend based on AVG Income
+                yearData.forEach((m) => {
+                    const minv = m.invest.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
+                    savingsRates.push(avgInc > 0 ? Math.round((minv / avgInc) * 100) : 0);
+                });
+
                 const burnRate = totalIncome > 0 ? Math.round((totalExpenses / totalIncome) * 100) : 0;
                 document.getElementById('year-burn-rate').innerText = `Burn Rate: ${burnRate}%`;
-                
                 const efficiency = totalIncome > 0 ? Math.round((totalInvest / totalIncome) * 100) : 0;
                 document.getElementById('year-efficiency').innerText = `Efficiency: ${efficiency}%`;
 
@@ -683,8 +671,6 @@
                 const lastAssets = [...assetData].reverse().find(a => a > 0) || 0;
                 const delta = lastAssets - firstAssets;
                 document.getElementById('year-wealth-delta').innerText = this.format(delta);
-                document.getElementById('year-wealth-delta').style.color = delta >= 0 ? '#10b981' : '#ef4444';
-                
                 const growthPercent = firstAssets > 0 ? Math.round((delta / firstAssets) * 100) : 0;
                 document.getElementById('year-growth-percent').innerText = `${growthPercent >= 0 ? '+' : ''}${growthPercent}% Wachstum`;
 
@@ -700,16 +686,7 @@
                             { label: 'Net Worth', data: assetData, type: 'line', borderColor: '#3b82f6', tension: 0.4, borderWidth: 4, pointRadius: 0, fill: false, yAxisID: 'y1' }
                         ]
                     },
-                    options: { 
-                        responsive: true, maintainAspectRatio: false,
-                        interaction: { mode: 'index', intersect: false },
-                        plugins: { legend: { position: 'top', labels: { font: { weight: '900', size: 10 } } } },
-                        scales: { 
-                            x: { type: 'category' },
-                            y: { grid: { display: false } },
-                            y1: { position: 'right', display: false } 
-                        }
-                    }
+                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'category' }, y1: { position: 'right', display: false } } }
                 });
 
                 const ctxSave = document.getElementById('year-savings-chart').getContext('2d');
@@ -724,13 +701,7 @@
                             fill: true, tension: 0.5, borderWidth: 4, pointRadius: 5, pointBackgroundColor: '#10b981'
                         }]
                     },
-                    options: { 
-                        responsive: true, maintainAspectRatio: false, 
-                        scales: { 
-                            x: { type: 'category' },
-                            y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } 
-                        }
-                    }
+                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'category' }, y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } } }
                 });
             },
 
@@ -754,7 +725,6 @@
                     const ctx = canvasHist.getContext('2d');
                     const yearData = this.state.db[this.state.year];
                     const labels = ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"];
-                    
                     let dataPoints = [];
                     let label = "";
                     let color = "#2563eb";
@@ -783,14 +753,7 @@
                                 pointRadius: 4, pointBackgroundColor: color
                             }]
                         },
-                        options: { 
-                            responsive: true, maintainAspectRatio: false, 
-                            plugins: { legend: { display: false } }, 
-                            scales: { 
-                                x: { type: 'category' },
-                                y: { display: false } 
-                            } 
-                        }
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { type: 'category' }, y: { display: false } } }
                     });
                 }
 
@@ -805,15 +768,10 @@
                             datasets: [{ 
                                 data: [totalExp, totalInv, Math.max(0, totalInc - totalExp - totalInv)], 
                                 backgroundColor: ['#ef4444', '#10b981', '#3b82f6'], 
-                                borderWidth: 0,
-                                hoverOffset: 15
+                                borderWidth: 0
                             }]
                         },
-                        options: { 
-                            responsive: true, maintainAspectRatio: false, 
-                            plugins: { legend: { position: 'bottom', labels: { font: { weight: '900' } } } }, 
-                            cutout: '82%' 
-                        }
+                        options: { responsive: true, maintainAspectRatio: false, cutout: '82%' }
                     });
                 }
             },
@@ -848,7 +806,7 @@
             },
 
             applyTheme() { document.body.className = this.state.theme; },
-            save() { localStorage.setItem('lw_tactical_v12', JSON.stringify(this.state)); },
+            save() { localStorage.setItem('lw_tactical_v13', JSON.stringify(this.state)); },
             export() {
                 const blob = new Blob([JSON.stringify(this.state)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
