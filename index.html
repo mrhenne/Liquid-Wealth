@@ -355,10 +355,26 @@
     <!-- YEAR VIEW -->
     <main id="view-year" class="max-w-[2400px] mx-auto p-4 md:p-8 space-y-8 hidden-view">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="liquid-glass p-8 border-l-4 border-l-blue-600"><p class="text-[11px] font-black opacity-60 uppercase">Ø Einnahmen</p><h2 id="year-avg-income" class="text-3xl font-black">0 €</h2></div>
-            <div class="liquid-glass p-8 border-l-4 border-l-red-500"><p class="text-[11px] font-black opacity-60 uppercase">Ø Ausgaben</p><h2 id="year-avg-expenses" class="text-3xl font-black">0 €</h2></div>
-            <div class="liquid-glass p-8 border-l-4 border-l-emerald-500"><p class="text-[11px] font-black opacity-60 uppercase">Ø Sparrate</p><h2 id="year-avg-savings" class="text-3xl font-black">0 €</h2></div>
-            <div class="liquid-glass p-8 border-l-4 border-l-indigo-600"><p class="text-[11px] font-black opacity-60 uppercase">Wachstum YTD</p><h2 id="year-wealth-delta" class="text-3xl font-black">0 €</h2><p id="year-growth-percent" class="text-[10px] font-bold text-indigo-500 uppercase">+0%</p></div>
+            <div class="liquid-glass p-8 border-l-4 border-l-blue-600">
+                <p class="text-[11px] font-black opacity-60 uppercase">Ø Einnahmen</p>
+                <h2 id="year-avg-income" class="text-3xl font-black tabular-nums">0 €</h2>
+                <p class="text-[9px] font-black opacity-40 uppercase mt-1">100% Basis</p>
+            </div>
+            <div class="liquid-glass p-8 border-l-4 border-l-red-500">
+                <p class="text-[11px] font-black opacity-60 uppercase">Ø Ausgaben</p>
+                <h2 id="year-avg-expenses" class="text-3xl font-black tabular-nums">0 €</h2>
+                <p id="year-exp-ratio" class="text-[9px] font-black opacity-40 uppercase mt-1">0% vom Einkommen</p>
+            </div>
+            <div class="liquid-glass p-8 border-l-4 border-l-emerald-500">
+                <p class="text-[11px] font-black opacity-60 uppercase">Ø Sparrate</p>
+                <h2 id="year-avg-savings" class="text-3xl font-black tabular-nums">0 €</h2>
+                <p id="year-sav-ratio" class="text-[9px] font-black opacity-40 uppercase mt-1">0% Sparquote</p>
+            </div>
+            <div class="liquid-glass p-8 border-l-4 border-l-indigo-600">
+                <p class="text-[11px] font-black opacity-60 uppercase">Wachstum YTD</p>
+                <h2 id="year-wealth-delta" class="text-3xl font-black tabular-nums">0 €</h2>
+                <p id="year-growth-percent" class="text-[10px] font-bold text-indigo-500 uppercase mt-1">+0%</p>
+            </div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8 liquid-glass p-8">
@@ -723,10 +739,20 @@
                     if(ti > 0 || te > 0) { totalI += ti; totalE += te; totalInv += tinv; months++; }
                 });
 
-                document.getElementById('year-avg-income').innerText = this.format(totalI / (months||1));
-                document.getElementById('year-avg-expenses').innerText = this.format(totalE / (months||1));
-                document.getElementById('year-avg-savings').innerText = this.format(totalInv / (months||1));
+                const avgI = totalI / (months||1);
+                const avgE = totalE / (months||1);
+                const avgS = totalInv / (months||1);
+
+                document.getElementById('year-avg-income').innerText = this.format(avgI);
+                document.getElementById('year-avg-expenses').innerText = this.format(avgE);
+                document.getElementById('year-avg-savings').innerText = this.format(avgS);
                 
+                // Set Year Ratios
+                const expRatio = avgI > 0 ? Math.round((avgE / avgI) * 100) : 0;
+                const savRatio = avgI > 0 ? Math.round((avgS / avgI) * 100) : 0;
+                document.getElementById('year-exp-ratio').innerText = `${expRatio}% vom Einkommen`;
+                document.getElementById('year-sav-ratio').innerText = `${savRatio}% Sparquote`;
+
                 yearData.forEach(m => {
                     const ti = m.income.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
                     const tinv = m.invest.filter(i=>i.recurring).reduce((s,i)=>s+i.val,0);
