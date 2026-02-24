@@ -43,26 +43,28 @@
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
         }
 
+        /* Ticker Animation Slower */
         @keyframes scroll {
-            0% { transform: translateX(50%); }
-            100% { transform: translateX(-100%); }
+            0% { transform: translateX(80%); }
+            100% { transform: translateX(-150%); }
         }
         .ticker-wrap {
             overflow: hidden;
             background: #000;
             color: #fff;
             white-space: nowrap;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 2px solid var(--accent);
         }
         .ticker-move {
             display: inline-block;
-            animation: scroll 40s linear infinite;
+            animation: scroll 80s linear infinite;
             font-weight: 800;
-            font-size: 12px;
+            font-size: 13px;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-        .ticker-item { display: inline-block; margin-right: 50px; }
+        .ticker-item { display: inline-block; margin-right: 60px; }
 
         .header-solid {
             background-color: var(--bg-page);
@@ -86,47 +88,54 @@
             50% { border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); }
         }
 
+        /* Fixed Collapsible Logic */
         .collapse-content {
-            max-height: 0;
+            display: none;
             overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
-        .collapse-content.open { max-height: 2000px; }
+        .collapse-content.open { 
+            display: block;
+        }
         .chevron { transition: transform 0.3s ease; }
         .chevron.rotated { transform: rotate(180deg); }
 
-        .suggestion-chip {
-            background: rgba(0,0,0,0.05);
-            padding: 3px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .dark .suggestion-chip { background: rgba(255,255,255,0.05); }
-        .suggestion-chip:hover { color: var(--accent); background: var(--accent-glow); }
-
         .hidden-view { display: none !important; }
+        
+        .stat-card-glow {
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card-glow::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            opacity: 0.1;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="light">
 
-    <!-- Crypto Ticker -->
+    <!-- Crypto Ticker (Slower & Bigger) -->
     <div class="ticker-wrap w-full">
         <div id="crypto-ticker" class="ticker-move">
-            Datenabgleich mit der Blockchain... ₿... ETH... SOL...
+            Warten auf Blockchain-Feed... ₿... ETH... SOL... LINK... DOT... MATIC...
         </div>
     </div>
 
     <!-- Navigation -->
     <nav id="nav-main" class="header-solid p-4 md:px-8 sticky top-0 backdrop-blur-md bg-opacity-90">
-        <div class="max-w-[2000px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="max-w-[2200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4">
                 <div class="bg-black text-white dark:bg-white dark:text-black w-10 h-10 flex items-center justify-center rounded-xl font-black text-xl shadow-xl">LW</div>
                 <div>
                     <h1 class="text-2xl font-black tracking-tighter uppercase leading-none">Liquid Wealth</h1>
-                    <p class="text-[9px] font-bold text-blue-600 uppercase tracking-widest mt-1">Elite Command Center</p>
+                    <p class="text-[9px] font-bold text-blue-600 uppercase tracking-widest mt-1">Tactical Analytics Engine</p>
                 </div>
             </div>
             
@@ -149,7 +158,7 @@
     </nav>
 
     <!-- MONTH VIEW -->
-    <main id="month-view" class="max-w-[2000px] mx-auto p-4 md:p-8 space-y-8">
+    <main id="month-view" class="max-w-[2200px] mx-auto p-4 md:p-8 space-y-8">
         
         <!-- Dashboard KPIs -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
@@ -161,7 +170,7 @@
             <div class="liquid-glass p-6 border-l-4 border-l-emerald-600">
                 <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-emerald-600">Cashflow</p>
                 <h2 id="kpi-cashflow" class="text-2xl font-black tabular-nums">0 €</h2>
-                <div id="kpi-savings-rate" class="text-[11px] font-bold text-emerald-500 mt-1 uppercase font-black">Invest-Quote: 0%</div>
+                <div id="kpi-savings-rate" class="text-[11px] font-bold text-emerald-500 mt-1 uppercase font-black">Sparrate: 0%</div>
             </div>
             <div class="liquid-glass p-6 border-l-4 border-l-blue-400">
                 <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Restbudget</p>
@@ -183,80 +192,86 @@
             <div class="liquid-glass p-6 border-l-4 border-l-slate-400">
                 <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-slate-500">Runway</p>
                 <h2 id="kpi-runway" class="text-2xl font-black tabular-nums">0 M.</h2>
-                <p class="text-[11px] font-bold opacity-40 mt-1 uppercase font-black">Autonomie</p>
+                <p class="text-[11px] font-bold opacity-40 mt-1 uppercase font-black">Survival Mode</p>
             </div>
         </div>
 
         <!-- Scaling Bento Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-6 items-start">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4 gap-8 items-start">
             
             <div class="liquid-glass overflow-hidden h-full">
-                <div onclick="app.toggleCollapse('col-income', 'chevron-income')" class="p-5 bg-slate-100 dark:bg-slate-800/40 cursor-pointer flex justify-between items-center group">
-                    <div><h3 class="text-xs font-black uppercase leading-none">Einnahmen</h3><span id="sum-income" class="text-[12px] font-bold text-blue-600">0 €</span></div>
+                <div onclick="app.toggleCollapse('col-income', 'chevron-income')" class="p-6 bg-slate-100 dark:bg-slate-800/40 cursor-pointer flex justify-between items-center group">
+                    <div><h3 class="text-xs font-black uppercase leading-none">Einnahmen</h3><span id="sum-income" class="text-[13px] font-bold text-blue-600">0 €</span></div>
                     <div class="flex items-center gap-3">
                         <button onclick="event.stopPropagation(); app.add('income')" class="w-8 h-8 bg-black dark:bg-white text-white dark:text-black font-black rounded-lg text-xs shadow-md hover:scale-110 transition-transform">+</button>
-                        <svg id="chevron-income" class="chevron w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        <svg id="chevron-income" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
-                <div id="col-income" class="collapse-content open p-5">
+                <div id="col-income" class="collapse-content open p-6">
                     <div id="list-income" class="space-y-4"></div>
                 </div>
             </div>
 
             <div class="liquid-glass overflow-hidden h-full">
-                <div onclick="app.toggleCollapse('col-expenses', 'chevron-expenses')" class="p-5 bg-red-50/50 dark:bg-red-900/10 cursor-pointer flex justify-between items-center group">
-                    <div><h3 class="text-xs font-black uppercase text-red-600 leading-none">Ausgaben</h3><span id="sum-expenses" class="text-[12px] font-bold text-red-500">0 €</span></div>
+                <div onclick="app.toggleCollapse('col-expenses', 'chevron-expenses')" class="p-6 bg-red-50/50 dark:bg-red-900/10 cursor-pointer flex justify-between items-center group">
+                    <div><h3 class="text-xs font-black uppercase text-red-600 leading-none">Ausgaben</h3><span id="sum-expenses" class="text-[13px] font-bold text-red-500">0 €</span></div>
                     <div class="flex items-center gap-3">
                         <button onclick="event.stopPropagation(); app.add('expenses')" class="w-8 h-8 bg-red-600 text-white font-black rounded-lg text-xs shadow-md hover:scale-110 transition-transform">+</button>
-                        <svg id="chevron-expenses" class="chevron w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        <svg id="chevron-expenses" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
-                <div id="col-expenses" class="collapse-content open p-5">
+                <div id="col-expenses" class="collapse-content open p-6">
                     <div id="list-expenses" class="space-y-4"></div>
                 </div>
             </div>
 
             <div class="liquid-glass overflow-hidden h-full">
-                <div onclick="app.toggleCollapse('col-invest', 'chevron-invest')" class="p-5 bg-emerald-50/50 dark:bg-emerald-900/10 cursor-pointer flex justify-between items-center group">
-                    <div><h3 class="text-xs font-black uppercase text-emerald-600 leading-none">Investments</h3><span id="sum-invest" class="text-[12px] font-bold text-emerald-500">0 €</span></div>
+                <div onclick="app.toggleCollapse('col-invest', 'chevron-invest')" class="p-6 bg-emerald-50/50 dark:bg-emerald-900/10 cursor-pointer flex justify-between items-center group">
+                    <div><h3 class="text-xs font-black uppercase text-emerald-600 leading-none">Investments</h3><span id="sum-invest" class="text-[13px] font-bold text-emerald-500">0 €</span></div>
                     <div class="flex items-center gap-3">
                         <button onclick="event.stopPropagation(); app.add('invest')" class="w-8 h-8 bg-emerald-600 text-white font-black rounded-lg text-xs shadow-md hover:scale-110 transition-transform">+</button>
-                        <svg id="chevron-invest" class="chevron w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        <svg id="chevron-invest" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
-                <div id="col-invest" class="collapse-content open p-5">
+                <div id="col-invest" class="collapse-content open p-6">
                     <div id="list-invest" class="space-y-4"></div>
                 </div>
             </div>
 
             <div class="liquid-glass overflow-hidden h-full">
-                <div onclick="app.toggleCollapse('col-assets', 'chevron-assets')" class="p-5 bg-blue-50/50 dark:bg-blue-900/10 cursor-pointer flex justify-between items-center group">
-                    <div><h3 class="text-xs font-black uppercase text-blue-600 leading-none">Bestand</h3><span id="sum-assets" class="text-[12px] font-bold text-blue-500">0 €</span></div>
+                <div onclick="app.toggleCollapse('col-assets', 'chevron-assets')" class="p-6 bg-blue-50/50 dark:bg-blue-900/10 cursor-pointer flex justify-between items-center group">
+                    <div><h3 class="text-xs font-black uppercase text-blue-600 leading-none">Bestand (Assets)</h3><span id="sum-assets" class="text-[13px] font-bold text-blue-500">0 €</span></div>
                     <div class="flex items-center gap-3">
                         <button onclick="event.stopPropagation(); app.add('assets')" class="w-8 h-8 bg-blue-600 text-white font-black rounded-lg text-xs shadow-md hover:scale-110 transition-transform">+</button>
-                        <svg id="chevron-assets" class="chevron w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        <svg id="chevron-assets" class="chevron w-6 h-6 opacity-50 rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
-                <div id="col-assets" class="collapse-content open p-5">
+                <div id="col-assets" class="collapse-content open p-6">
                     <div id="list-assets" class="space-y-4"></div>
                 </div>
             </div>
         </div>
 
         <!-- Strategy & Charts -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-8 liquid-glass p-8">
-                <h3 class="text-xs font-black uppercase mb-6 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
-                    Portfolio Verlauf
-                </h3>
-                <div class="h-[350px]"><canvas id="chart-history"></canvas></div>
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+            <div class="xl:col-span-8 liquid-glass p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xs font-black uppercase flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
+                        Portfolio Intelligence
+                    </h3>
+                    <div class="flex gap-2">
+                        <button onclick="app.updateCharts('wealth')" class="text-[10px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg">WEALTH</button>
+                        <button onclick="app.updateCharts('cashflow')" class="text-[10px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg">CASHFLOW</button>
+                    </div>
+                </div>
+                <div class="h-[380px]"><canvas id="chart-history"></canvas></div>
             </div>
             
-            <div class="lg:col-span-4 space-y-8">
-                <!-- Emergency Fund (Small Version) -->
+            <div class="xl:col-span-4 space-y-8">
+                <!-- Emergency Fund (Compact) -->
                 <div class="liquid-glass p-6 border-l-4 border-l-orange-500">
-                    <h3 class="text-[10px] font-black uppercase mb-4 opacity-70">Notgroschen Puffer</h3>
+                    <h3 class="text-[10px] font-black uppercase mb-4 opacity-70">Notgroschen Strategie</h3>
                     <div class="flex items-center justify-between gap-4">
                         <div class="flex-1">
                             <p id="ui-emergency-target" class="text-xl font-black text-orange-600">0 €</p>
@@ -270,33 +285,49 @@
                 </div>
                 
                 <div class="liquid-glass p-6">
-                    <h3 class="text-[10px] font-black uppercase mb-4 opacity-70 text-indigo-500">Effizienz</h3>
-                    <div class="h-[200px]"><canvas id="chart-comparison"></canvas></div>
+                    <h3 class="text-[10px] font-black uppercase mb-4 opacity-70 text-indigo-500 text-center">Cash-Effizienz</h3>
+                    <div class="h-[230px]"><canvas id="chart-comparison"></canvas></div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- YEAR VIEW -->
-    <main id="year-view" class="max-w-[2000px] mx-auto p-4 md:p-8 space-y-8 hidden-view">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="liquid-glass p-8 border-l-4 border-l-blue-600">
+    <!-- YEAR VIEW (Expanded) -->
+    <main id="year-view" class="max-w-[2200px] mx-auto p-4 md:p-8 space-y-8 hidden-view">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="liquid-glass p-8 border-l-4 border-l-blue-600 stat-card-glow">
                 <p class="text-[11px] font-black opacity-60 uppercase tracking-widest">Ø Einkommen / Monat</p>
                 <h2 id="year-avg-income" class="text-4xl font-black tabular-nums">0 €</h2>
+                <p class="text-[10px] font-bold mt-2 opacity-40">Gesamtjahr Performance</p>
             </div>
-            <div class="liquid-glass p-8 border-l-4 border-l-red-500">
-                <p class="text-[11px] font-black opacity-60 uppercase tracking-widest">Gesamtausgaben Jahr</p>
-                <h2 id="year-total-expenses" class="text-4xl font-black tabular-nums">0 €</h2>
+            <div class="liquid-glass p-8 border-l-4 border-l-red-500 stat-card-glow">
+                <p class="text-[11px] font-black opacity-60 uppercase tracking-widest">Ø Ausgaben / Monat</p>
+                <h2 id="year-avg-expenses" class="text-4xl font-black tabular-nums">0 €</h2>
+                <p id="year-burn-rate" class="text-[10px] font-bold mt-2 text-red-500">Burn Rate: 0%</p>
             </div>
-            <div class="liquid-glass p-8 border-l-4 border-l-emerald-500">
-                <p class="text-[11px] font-black opacity-60 uppercase tracking-widest">Gesamtinvestitionen Jahr</p>
-                <h2 id="year-total-invest" class="text-4xl font-black tabular-nums">0 €</h2>
+            <div class="liquid-glass p-8 border-l-4 border-l-emerald-500 stat-card-glow">
+                <p class="text-[11px] font-black opacity-60 uppercase tracking-widest">Ø Sparrate / Monat</p>
+                <h2 id="year-avg-savings" class="text-4xl font-black tabular-nums">0 €</h2>
+                <p id="year-efficiency" class="text-[10px] font-bold mt-2 text-emerald-500">Efficiency: 0%</p>
+            </div>
+            <div class="liquid-glass p-8 border-l-4 border-l-indigo-600 stat-card-glow">
+                <p class="text-[11px] font-black opacity-60 uppercase tracking-widest">Vermögenszuwachs (YTD)</p>
+                <h2 id="year-wealth-delta" class="text-4xl font-black tabular-nums">0 €</h2>
+                <p id="year-growth-percent" class="text-[10px] font-bold mt-2 text-indigo-500">+0% Wachstum</p>
             </div>
         </div>
 
-        <div class="liquid-glass p-8">
-            <h3 class="text-xs font-black uppercase mb-8">Jahres-Verlauf</h3>
-            <div class="h-[450px]"><canvas id="year-chart"></canvas></div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8 liquid-glass p-8">
+                <h3 class="text-xs font-black uppercase mb-8">Jahres-Dynamik: Einkommen vs. Ausgaben vs. Assets</h3>
+                <div class="h-[500px]"><canvas id="year-chart"></canvas></div>
+            </div>
+            <div class="lg:col-span-4 space-y-8">
+                <div class="liquid-glass p-8">
+                    <h3 class="text-xs font-black uppercase mb-6 text-center">Sparraten-Trend (%)</h3>
+                    <div class="h-[400px]"><canvas id="year-savings-chart"></canvas></div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -304,7 +335,7 @@
     <div id="copy-modal" class="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="liquid-glass max-w-sm w-full bg-white/95 dark:bg-slate-900/95 p-8 shadow-2xl">
             <h3 class="text-lg font-black uppercase mb-2">Daten Kopieren</h3>
-            <p class="text-[11px] font-bold mb-6 opacity-60">Struktur und Werte aus einem anderen Monat übertragen.</p>
+            <p class="text-[11px] font-bold mb-6 opacity-60">Komplette Struktur eines Monats übernehmen.</p>
             <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-3">
                     <select id="copy-year" class="w-full text-xs"></select>
@@ -345,9 +376,10 @@
                 month: new Date().getMonth(),
                 theme: 'light',
                 view: 'month',
+                chartMode: 'wealth',
                 db: {}
             },
-            charts: { history: null, comparison: null, year: null },
+            charts: { history: null, comparison: null, year: null, yearSavings: null },
 
             async init() {
                 const saved = localStorage.getItem('lw_tactical_v11');
@@ -387,11 +419,11 @@
                     data.forEach(coin => {
                         const color = coin.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500';
                         const arrow = coin.price_change_percentage_24h >= 0 ? '▲' : '▼';
-                        html += `<span class="ticker-item">${coin.symbol}: ${coin.current_price.toLocaleString('de-DE')}€ <span class="${color}">${arrow} ${coin.price_change_percentage_24h.toFixed(1)}%</span></span>`;
+                        html += `<span class="ticker-item font-black">${coin.symbol}: ${coin.current_price.toLocaleString('de-DE')}€ <span class="${color}">${arrow} ${coin.price_change_percentage_24h.toFixed(1)}%</span></span>`;
                     });
                     ticker.innerHTML = html + html;
                 } catch (e) {
-                    ticker.innerText = "Ticker momentan nicht erreichbar.";
+                    ticker.innerText = "Ticker momentan nicht erreichbar. Checke API.";
                 }
             },
 
@@ -428,7 +460,7 @@
                     div.className = "flex gap-2 items-center group";
                     div.innerHTML = `
                         <input type="checkbox" ${item.recurring ? 'checked' : ''} onchange="app.toggleRecurring('${type}', ${idx})" title="Wiederkehrend" class="w-4 h-4 cursor-pointer accent-blue-600">
-                        <input type="text" value="${item.name}" onchange="app.updateItem('${type}', ${idx}, 'name', this.value)" class="flex-1 text-[11px] p-2 bg-transparent border-none">
+                        <input type="text" value="${item.name}" onchange="app.updateItem('${type}', ${idx}, 'name', this.value)" class="flex-1 text-[11px] p-2 bg-transparent border-none font-bold">
                         <input type="number" value="${item.val}" onchange="app.updateItem('${type}', ${idx}, 'val', this.value)" class="w-24 text-right text-[11px] p-2 bg-transparent border-none font-black">
                         <button onclick="app.remove('${type}', ${idx})" class="text-red-500 font-bold px-3 opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
                     `;
@@ -448,10 +480,7 @@
                 const prevYear = currentMonth === 0 ? this.state.year - 1 : this.state.year;
                 
                 const prevYearStr = prevYear.toString();
-                if(!this.state.db[prevYearStr] || !this.state.db[prevYearStr][prevMonth]) {
-                    console.log("Keine Daten im Vormonat gefunden.");
-                    return;
-                }
+                if(!this.state.db[prevYearStr] || !this.state.db[prevYearStr][prevMonth]) return;
 
                 const source = this.state.db[prevYearStr][prevMonth];
                 const target = this.state.db[this.state.year][this.state.month];
@@ -459,7 +488,6 @@
                 ['income', 'expenses', 'invest'].forEach(type => {
                     source[type].forEach(item => {
                         if(item.recurring) {
-                            // Prüfen ob schon vorhanden
                             if(!target[type].find(t => t.name === item.name)) {
                                 target[type].push(JSON.parse(JSON.stringify(item)));
                             }
@@ -472,8 +500,16 @@
             toggleCollapse(id, chevronId) {
                 const el = document.getElementById(id);
                 const chev = document.getElementById(chevronId);
-                if(el) el.classList.toggle('open');
-                if(chev) chev.classList.toggle('rotated');
+                if(el) {
+                    const isOpen = el.classList.contains('open');
+                    if(isOpen) {
+                        el.classList.remove('open');
+                        chev.classList.remove('rotated');
+                    } else {
+                        el.classList.add('open');
+                        chev.classList.add('rotated');
+                    }
+                }
             },
 
             updateItem(type, idx, field, val) {
@@ -523,7 +559,7 @@
                 setVal('kpi-cashflow', this.format(totalInc - totalExp));
                 
                 const rate = totalInc > 0 ? Math.round((totalInv / totalInc) * 100) : 0;
-                setVal('kpi-savings-rate', `Invest-Quote: ${rate}%`);
+                setVal('kpi-savings-rate', `Sparrate: ${rate}%`);
 
                 const remaining = totalInc - totalExp - totalInv;
                 setVal('kpi-remaining', this.format(remaining), remaining < 0 ? '#ef4444' : (remaining > 0 ? '#10b981' : 'inherit'));
@@ -561,7 +597,7 @@
             renderYearView() {
                 const yearData = this.state.db[this.state.year];
                 let totalIncome = 0; let totalExpenses = 0; let totalInvest = 0; let filledMonths = 0;
-                const incData = []; const expData = []; const assetData = [];
+                const incData = []; const expData = []; const assetData = []; const savingsRates = [];
 
                 yearData.forEach((m, idx) => {
                     const mi = m.income.reduce((s, i) => s + i.val, 0);
@@ -570,18 +606,38 @@
                     const ma = m.assets.reduce((s, i) => s + i.val, 0);
 
                     incData.push(mi); expData.push(me); assetData.push(ma);
+                    savingsRates.push(mi > 0 ? Math.round((minv / mi) * 100) : 0);
+
                     if(mi > 0 || me > 0) {
                         totalIncome += mi; totalExpenses += me; totalInvest += minv; filledMonths++;
                     }
                 });
 
-                const yi = document.getElementById('year-avg-income');
-                const ye = document.getElementById('year-total-expenses');
-                const yiv = document.getElementById('year-total-invest');
-                if(yi) yi.innerText = this.format(totalIncome / (filledMonths || 1));
-                if(ye) ye.innerText = this.format(totalExpenses);
-                if(yiv) yiv.innerText = this.format(totalInvest);
+                const avgInc = totalIncome / (filledMonths || 1);
+                const avgExp = totalExpenses / (filledMonths || 1);
+                const avgInv = totalInvest / (filledMonths || 1);
+                
+                document.getElementById('year-avg-income').innerText = this.format(avgInc);
+                document.getElementById('year-avg-expenses').innerText = this.format(avgExp);
+                document.getElementById('year-avg-savings').innerText = this.format(avgInv);
+                
+                const burnRate = avgInc > 0 ? Math.round((avgExp / avgInc) * 100) : 0;
+                document.getElementById('year-burn-rate').innerText = `Burn Rate: ${burnRate}%`;
+                
+                const efficiency = avgInc > 0 ? Math.round((avgInv / avgInc) * 100) : 0;
+                document.getElementById('year-efficiency').innerText = `Efficiency: ${efficiency}%`;
 
+                // YTD Growth
+                const firstAssets = assetData.find(a => a > 0) || 0;
+                const lastAssets = [...assetData].reverse().find(a => a > 0) || 0;
+                const delta = lastAssets - firstAssets;
+                document.getElementById('year-wealth-delta').innerText = this.format(delta);
+                document.getElementById('year-wealth-delta').style.color = delta >= 0 ? '#10b981' : '#ef4444';
+                
+                const growthPercent = firstAssets > 0 ? Math.round((delta / firstAssets) * 100) : 0;
+                document.getElementById('year-growth-percent').innerText = `${growthPercent >= 0 ? '+' : ''}${growthPercent}% Wachstum`;
+
+                // Multi-Axis Chart
                 const ctx = document.getElementById('year-chart').getContext('2d');
                 if(this.charts.year) this.charts.year.destroy();
                 this.charts.year = new Chart(ctx, {
@@ -589,14 +645,38 @@
                     data: {
                         labels: ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
                         datasets: [
-                            { label: 'Einnahmen', data: incData, backgroundColor: 'rgba(37, 99, 235, 0.7)', borderRadius: 5 },
-                            { label: 'Ausgaben', data: expData, backgroundColor: 'rgba(239, 68, 68, 0.7)', borderRadius: 5 },
-                            { label: 'Net Worth', data: assetData, type: 'line', borderColor: '#3b82f6', tension: 0.35, yAxisID: 'y1' }
+                            { label: 'Einnahmen', data: incData, backgroundColor: 'rgba(37, 99, 235, 0.7)', borderRadius: 8, barThickness: 15 },
+                            { label: 'Ausgaben', data: expData, backgroundColor: 'rgba(239, 68, 68, 0.7)', borderRadius: 8, barThickness: 15 },
+                            { label: 'Net Worth (Linie)', data: assetData, type: 'line', borderColor: '#3b82f6', tension: 0.4, borderAlpha: 1, borderWidth: 4, pointRadius: 0, fill: false, yAxisID: 'y1' }
                         ]
                     },
                     options: { 
                         responsive: true, maintainAspectRatio: false,
-                        scales: { y1: { position: 'right', display: false } }
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: { legend: { position: 'top', labels: { font: { weight: '900', size: 10 } } } },
+                        scales: { 
+                            y: { grid: { display: false } },
+                            y1: { position: 'right', display: false } 
+                        }
+                    }
+                });
+
+                // Savings Chart
+                const ctxSave = document.getElementById('year-savings-chart').getContext('2d');
+                if(this.charts.yearSavings) this.charts.yearSavings.destroy();
+                this.charts.yearSavings = new Chart(ctxSave, {
+                    type: 'line',
+                    data: {
+                        labels: ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
+                        datasets: [{ 
+                            label: 'Sparrate (%)', data: savingsRates, 
+                            borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', 
+                            fill: true, tension: 0.5, borderWidth: 4, pointRadius: 5, pointBackgroundColor: '#10b981'
+                        }]
+                    },
+                    options: { 
+                        responsive: true, maintainAspectRatio: false, 
+                        scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } }
                     }
                 });
             },
@@ -609,7 +689,8 @@
                 this.render();
             },
 
-            updateCharts() {
+            updateCharts(mode = this.state.chartMode) {
+                this.state.chartMode = mode;
                 const data = this.state.db[this.state.year][this.state.month];
                 const totalInc = data.income.reduce((s, i) => s + i.val, 0);
                 const totalExp = data.expenses.reduce((s, i) => s + i.val, 0);
@@ -620,18 +701,40 @@
                     const ctx = canvasHist.getContext('2d');
                     const yearData = this.state.db[this.state.year];
                     const labels = ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"];
-                    const dataPoints = yearData.map(m => m.assets.reduce((s, i) => s + i.val, 0));
+                    
+                    let dataPoints = [];
+                    let label = "";
+                    let color = "#2563eb";
+
+                    if(mode === 'wealth') {
+                        dataPoints = yearData.map(m => m.assets.reduce((s, i) => s + i.val, 0));
+                        label = "Net Worth";
+                    } else {
+                        dataPoints = yearData.map(m => {
+                            const inc = m.income.reduce((s, i) => s + i.val, 0);
+                            const exp = m.expenses.reduce((s, i) => s + i.val, 0);
+                            return inc - exp;
+                        });
+                        label = "Cashflow";
+                        color = "#10b981";
+                    }
+
                     if(this.charts.history) this.charts.history.destroy();
                     this.charts.history = new Chart(ctx, {
                         type: 'line',
                         data: {
                             labels,
                             datasets: [{
-                                data: dataPoints, borderColor: '#2563eb', borderWidth: 4, tension: 0.35, fill: true,
-                                backgroundColor: 'rgba(37, 99, 235, 0.08)', pointRadius: 4, pointBackgroundColor: '#2563eb'
+                                label, data: dataPoints, borderColor: color, borderWidth: 5, tension: 0.4, fill: true,
+                                backgroundColor: mode === 'wealth' ? 'rgba(37, 99, 235, 0.05)' : 'rgba(16, 185, 129, 0.05)',
+                                pointRadius: 4, pointBackgroundColor: color
                             }]
                         },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 10 }, color: '#64748b' } } } }
+                        options: { 
+                            responsive: true, maintainAspectRatio: false, 
+                            plugins: { legend: { display: false } }, 
+                            scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { weight: '900', size: 10 } } } } 
+                        }
                     });
                 }
 
@@ -642,10 +745,19 @@
                     this.charts.comparison = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
-                            labels: ['Ausgaben', 'Investment', 'Cashflow'],
-                            datasets: [{ data: [totalExp, totalInv, Math.max(0, totalInc - totalExp - totalInv)], backgroundColor: ['#ef4444', '#10b981', '#3b82f6'], borderWidth: 0 }]
+                            labels: ['Spend', 'Invest', 'Rest'],
+                            datasets: [{ 
+                                data: [totalExp, totalInv, Math.max(0, totalInc - totalExp - totalInv)], 
+                                backgroundColor: ['#ef4444', '#10b981', '#3b82f6'], 
+                                borderWidth: 0,
+                                hoverOffset: 15
+                            }]
                         },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '75%' }
+                        options: { 
+                            responsive: true, maintainAspectRatio: false, 
+                            plugins: { legend: { position: 'bottom', labels: { font: { weight: '900' } } } }, 
+                            cutout: '82%' 
+                        }
                     });
                 }
             },
