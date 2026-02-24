@@ -126,7 +126,6 @@
             pointer-events: none;
         }
 
-        /* --- New Date Switcher Styles --- */
         .date-chip {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
@@ -152,6 +151,13 @@
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Tactical Live Wealth Header */
+        .live-wealth-header {
+            background: linear-gradient(to right, transparent, var(--accent-glow), transparent);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
     </style>
 </head>
 <body class="light">
@@ -202,6 +208,14 @@
                 </div>
             </div>
         </div>
+        <!-- Total Wealth Live Bar -->
+        <div class="live-wealth-header w-full py-1 text-center">
+            <span class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">
+                Live Status: <span id="header-wealth-val" class="text-blue-600">0 €</span> 
+                <span class="mx-3 opacity-30">|</span> 
+                <span id="header-date" class="opacity-60">24.02.2026</span>
+            </span>
+        </div>
     </nav>
 
     <!-- MONTH VIEW -->
@@ -214,19 +228,19 @@
                 <h2 id="kpi-wealth" class="text-2xl font-black tabular-nums">0 €</h2>
                 <p id="kpi-btc" class="text-[10px] font-bold text-orange-500 mt-1 uppercase">₿ 0 BTC</p>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-emerald-600">
+            <div class="liquid-glass p-6 breathe border-l-4 border-l-emerald-600">
                 <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-emerald-600">Cashflow</p>
                 <h2 id="kpi-cashflow" class="text-2xl font-black tabular-nums">0 €</h2>
                 <div id="kpi-savings-rate" class="text-[11px] font-bold text-emerald-500 mt-1 uppercase font-black">Sparrate: 0%</div>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-blue-400">
+            <div class="liquid-glass p-6 breathe border-l-4 border-l-blue-400">
                 <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Restbudget</p>
                 <h2 id="kpi-remaining" class="text-2xl font-black tabular-nums">0 €</h2>
                 <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 mt-2 rounded-full overflow-hidden">
                     <div id="savings-progress" class="bg-blue-500 h-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
-            <div class="liquid-glass p-6 border-l-4 border-l-orange-500">
+            <div class="liquid-glass p-6 breathe border-l-4 border-l-orange-500">
                 <p class="text-[10px] font-black opacity-60 uppercase tracking-widest text-orange-500">Notgroschen</p>
                 <h2 id="kpi-emergency" class="text-2xl font-black tabular-nums">0%</h2>
                 <p id="kpi-emergency-months" class="text-[11px] font-bold opacity-40 mt-1 uppercase font-black">0.0 Monate</p>
@@ -306,14 +320,16 @@
         <!-- Strategy & Charts -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
             <div class="xl:col-span-8 liquid-glass p-8">
-                <div class="flex justify-between items-center mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <h3 class="text-xs font-black uppercase flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
                         Portfolio Intelligence
                     </h3>
-                    <div class="flex gap-2">
-                        <button onclick="app.updateCharts('wealth')" class="text-[10px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg uppercase">Wealth</button>
-                        <button onclick="app.updateCharts('cashflow')" class="text-[10px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg uppercase">Cashflow</button>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="app.updateCharts('wealth')" class="text-[9px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg hover:bg-blue-600 hover:text-white transition-all uppercase">Wealth</button>
+                        <button onclick="app.updateCharts('cashflow')" class="text-[9px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg hover:bg-emerald-600 hover:text-white transition-all uppercase">Cashflow</button>
+                        <button onclick="app.updateCharts('income')" class="text-[9px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg hover:bg-blue-500 hover:text-white transition-all uppercase">Income</button>
+                        <button onclick="app.updateCharts('expenses')" class="text-[9px] font-black px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg hover:bg-red-500 hover:text-white transition-all uppercase">Expenses</button>
                     </div>
                 </div>
                 <div class="h-[380px]"><canvas id="chart-history"></canvas></div>
@@ -452,6 +468,9 @@
                     });
                 }
 
+                // Initial date for display
+                document.getElementById('header-date').innerText = new Date().toLocaleDateString('de-DE');
+
                 this.checkDB();
                 this.applyTheme();
                 this.updateDateUI();
@@ -510,11 +529,10 @@
             },
 
             render() {
-                // Add fade animation to main areas
                 ['month-view', 'year-view'].forEach(id => {
                     const el = document.getElementById(id);
                     el.classList.remove('view-fade');
-                    void el.offsetWidth; // trigger reflow
+                    void el.offsetWidth;
                     el.classList.add('view-fade');
                 });
 
@@ -578,19 +596,8 @@
                 this.render();
             },
 
-            setMonth(m) {
-                this.state.month = m;
-                this.updateDateUI();
-                this.render();
-            },
-
-            setYear(y) {
-                this.state.year = parseInt(y);
-                this.checkDB();
-                this.updateDateUI();
-                this.render();
-            },
-
+            setMonth(m) { this.state.month = m; this.updateDateUI(); this.render(); },
+            setYear(y) { this.state.year = parseInt(y); this.checkDB(); this.updateDateUI(); this.render(); },
             updateDateUI() {
                 const chips = document.querySelectorAll('#month-nav .date-chip');
                 chips.forEach((c, idx) => {
@@ -600,11 +607,7 @@
                 document.getElementById('ui-year').value = this.state.year;
             },
 
-            toggleRecurring(type, idx) {
-                const item = this.state.db[this.state.year][this.state.month][type][idx];
-                item.recurring = !item.recurring;
-                this.render();
-            },
+            toggleRecurring(type, idx) { const item = this.state.db[this.state.year][this.state.month][type][idx]; item.recurring = !item.recurring; this.render(); },
 
             syncCategoryFromPrev(type) {
                 const currentMonth = this.state.month;
@@ -612,35 +615,18 @@
                 const prevYear = currentMonth === 0 ? this.state.year - 1 : this.state.year;
                 const prevYearStr = prevYear.toString();
                 if(!this.state.db[prevYearStr] || !this.state.db[prevYearStr][prevMonth]) return;
-
                 const source = this.state.db[prevYearStr][prevMonth][type];
                 const target = this.state.db[this.state.year][this.state.month][type];
-
                 source.forEach(item => {
-                    if(!target.find(t => t.name === item.name)) {
-                        target.push(JSON.parse(JSON.stringify(item)));
-                    } else {
-                        const existing = target.find(t => t.name === item.name);
-                        existing.val = item.val;
-                    }
+                    if(!target.find(t => t.name === item.name)) { target.push(JSON.parse(JSON.stringify(item))); }
+                    else { const existing = target.find(t => t.name === item.name); existing.val = item.val; }
                 });
                 this.render();
             },
 
             syncRecurring() { ['income', 'expenses', 'invest', 'assets'].forEach(type => this.syncCategoryFromPrev(type)); },
-
-            toggleCollapse(id, chevronId) {
-                const el = document.getElementById(id);
-                const chev = document.getElementById(chevronId);
-                if(el) { el.classList.toggle('open'); chev.classList.toggle('rotated'); }
-            },
-
-            updateItem(type, idx, field, val) {
-                const item = this.state.db[this.state.year][this.state.month][type][idx];
-                item[field] = field === 'val' ? parseFloat(val) || 0 : val;
-                this.render();
-            },
-
+            toggleCollapse(id, chevronId) { const el = document.getElementById(id); const chev = document.getElementById(chevronId); if(el) { el.classList.toggle('open'); chev.classList.toggle('rotated'); } },
+            updateItem(type, idx, field, val) { const item = this.state.db[this.state.year][this.state.month][type][idx]; item[field] = field === 'val' ? parseFloat(val) || 0 : val; this.render(); },
             add(type) { this.state.db[this.state.year][this.state.month][type].push({ name: 'Neu...', val: 0, recurring: true }); this.render(); },
             remove(type, idx) { this.state.db[this.state.year][this.state.month][type].splice(idx, 1); this.render(); },
 
@@ -651,18 +637,20 @@
                 const totalInv = (data.invest || []).filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                 const totalAssets = data.assets.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                 const setVal = (id, val, color) => { const el = document.getElementById(id); if(el) { el.innerText = val; if(color) el.style.color = color; } };
-
                 setVal('sum-income', this.format(totalInc));
                 setVal('sum-expenses', this.format(totalExp));
                 setVal('sum-invest', this.format(totalInv));
                 setVal('sum-assets', this.format(totalAssets));
+
+                // Global Wealth Updates
+                setVal('header-wealth-val', this.format(totalAssets));
 
                 const cash = data.assets.filter(a => a.recurring && (a.name.toLowerCase().includes('cash') || a.name.toLowerCase().includes('notgroschen'))).reduce((s, i) => s + i.val, 0);
                 const btcPrice = parseFloat(document.getElementById('cfg-btc').value) || 1;
                 const roi = parseFloat(document.getElementById('cfg-roi').value);
                 const target = parseFloat(document.getElementById('cfg-target').value);
                 const emerMonthsTarget = parseFloat(document.getElementById('cfg-emergency-months').value) || 3;
-
+                
                 setVal('kpi-wealth', this.format(totalAssets));
                 setVal('kpi-btc', `₿ ${(totalAssets / btcPrice).toFixed(6)} BTC`);
                 setVal('kpi-cashflow', this.format(totalInc - totalExp));
@@ -695,7 +683,6 @@
                 const yearData = this.state.db[this.state.year];
                 let totalIncome = 0; let totalExpenses = 0; let totalInvest = 0; let filledMonths = 0;
                 const incData = []; const expData = []; const assetData = []; const savingsRates = [];
-
                 yearData.forEach((m) => {
                     const mi = m.income.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                     const me = m.expenses.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
@@ -704,67 +691,66 @@
                     incData.push(mi); expData.push(me); assetData.push(ma);
                     if(mi > 0 || me > 0) { totalIncome += mi; totalExpenses += me; totalInvest += minv; filledMonths++; }
                 });
-
                 const avgInc = totalIncome / (filledMonths || 1);
                 document.getElementById('year-avg-income').innerText = this.format(avgInc);
                 document.getElementById('year-avg-expenses').innerText = this.format(totalExpenses / (filledMonths || 1));
                 document.getElementById('year-avg-savings').innerText = this.format(totalInvest / (filledMonths || 1));
-                
                 yearData.forEach((m) => {
                     const minv = m.invest.filter(i => i.recurring).reduce((s, i) => s + i.val, 0);
                     savingsRates.push(avgInc > 0 ? Math.round((minv / avgInc) * 100) : 0);
                 });
-
                 const burnRate = totalIncome > 0 ? Math.round((totalExpenses / totalIncome) * 100) : 0;
                 document.getElementById('year-burn-rate').innerText = `Burn Rate: ${burnRate}%`;
                 const efficiency = totalIncome > 0 ? Math.round((totalInvest / totalIncome) * 100) : 0;
                 document.getElementById('year-efficiency').innerText = `Efficiency: ${efficiency}%`;
-
                 const firstAssets = assetData.find(a => a > 0) || 0;
                 const lastAssets = [...assetData].reverse().find(a => a > 0) || 0;
                 const delta = lastAssets - firstAssets;
                 document.getElementById('year-wealth-delta').innerText = this.format(delta);
                 const growthPercent = firstAssets > 0 ? Math.round((delta / firstAssets) * 100) : 0;
                 document.getElementById('year-growth-percent').innerText = `${growthPercent >= 0 ? '+' : ''}${growthPercent}% Wachstum`;
-
+                
                 const ctx = document.getElementById('year-chart').getContext('2d');
                 if(this.charts.year) this.charts.year.destroy();
-                this.charts.year = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
+                this.charts.year = new Chart(ctx, { 
+                    type: 'bar', 
+                    data: { 
+                        labels: ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"], 
                         datasets: [
-                            { label: 'Einnahmen', data: incData, backgroundColor: 'rgba(37, 99, 235, 0.7)', borderRadius: 8, barThickness: 15 },
-                            { label: 'Ausgaben', data: expData, backgroundColor: 'rgba(239, 68, 68, 0.7)', borderRadius: 8, barThickness: 15 },
+                            { label: 'Einnahmen', data: incData, backgroundColor: 'rgba(37, 99, 235, 0.7)', borderRadius: 8, barThickness: 15 }, 
+                            { label: 'Ausgaben', data: expData, backgroundColor: 'rgba(239, 68, 68, 0.7)', borderRadius: 8, barThickness: 15 }, 
                             { label: 'Net Worth', data: assetData, type: 'line', borderColor: '#3b82f6', tension: 0.4, borderWidth: 4, pointRadius: 0, fill: false, yAxisID: 'y1' }
-                        ]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'category' }, y1: { position: 'right', display: false } } }
+                        ] 
+                    }, 
+                    options: { 
+                        responsive: true, maintainAspectRatio: false, 
+                        scales: { 
+                            x: { type: 'category' }, 
+                            y: { grid: { display: false }, beginAtZero: false },
+                            y1: { position: 'right', display: false, beginAtZero: false } 
+                        } 
+                    } 
                 });
 
                 const ctxSave = document.getElementById('year-savings-chart').getContext('2d');
                 if(this.charts.yearSavings) this.charts.yearSavings.destroy();
-                this.charts.yearSavings = new Chart(ctxSave, {
-                    type: 'line',
-                    data: {
-                        labels: ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
-                        datasets: [{ 
-                            label: 'Sparrate (%)', data: savingsRates, 
-                            borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', 
-                            fill: true, tension: 0.5, borderWidth: 4, pointRadius: 5, pointBackgroundColor: '#10b981'
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'category' }, y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } } }
+                this.charts.yearSavings = new Chart(ctxSave, { 
+                    type: 'line', 
+                    data: { 
+                        labels: ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"], 
+                        datasets: [{ label: 'Sparrate (%)', data: savingsRates, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.5, borderWidth: 4, pointRadius: 5, pointBackgroundColor: '#10b981' }] 
+                    }, 
+                    options: { 
+                        responsive: true, maintainAspectRatio: false, 
+                        scales: { 
+                            x: { type: 'category' }, 
+                            y: { min: 0, suggestedMax: 100, ticks: { callback: v => v + '%' } } 
+                        } 
+                    } 
                 });
             },
 
-            toggleView() {
-                this.state.view = this.state.view === 'month' ? 'year' : 'month';
-                document.getElementById('month-view').classList.toggle('hidden-view');
-                document.getElementById('year-view').classList.toggle('hidden-view');
-                document.getElementById('view-toggle-btn').innerText = this.state.view === 'month' ? 'JAHRESÜBERSICHT' : 'MONATSANSICHT';
-                this.render();
-            },
+            toggleView() { this.state.view = this.state.view === 'month' ? 'year' : 'month'; document.getElementById('month-view').classList.toggle('hidden-view'); document.getElementById('year-view').classList.toggle('hidden-view'); document.getElementById('view-toggle-btn').innerText = this.state.view === 'month' ? 'JAHRESÜBERSICHT' : 'MONATSANSICHT'; this.render(); },
 
             updateCharts(mode = this.state.chartMode) {
                 this.state.chartMode = mode;
@@ -778,20 +764,35 @@
                     const yearData = this.state.db[this.state.year];
                     const labels = ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"];
                     let dataPoints = []; let label = ""; let color = "#2563eb";
-                    if(mode === 'wealth') { dataPoints = yearData.map(m => m.assets.filter(i => i.recurring).reduce((s, i) => s + i.val, 0)); label = "Net Worth"; }
-                    else { dataPoints = yearData.map(m => { const inc = m.income.filter(i => i.recurring).reduce((s, i) => s + i.val, 0); const exp = m.expenses.filter(i => i.recurring).reduce((s, i) => s + i.val, 0); return inc - exp; }); label = "Cashflow"; color = "#10b981"; }
+                    
+                    if(mode === 'wealth') { dataPoints = yearData.map(m => m.assets.filter(i => i.recurring).reduce((s, i) => s + i.val, 0)); label = "Net Worth"; color = "#2563eb"; }
+                    else if(mode === 'cashflow') { dataPoints = yearData.map(m => { const inc = m.income.filter(i => i.recurring).reduce((s, i) => s + i.val, 0); const exp = m.expenses.filter(i => i.recurring).reduce((s, i) => s + i.val, 0); return inc - exp; }); label = "Cashflow"; color = "#10b981"; }
+                    else if(mode === 'income') { dataPoints = yearData.map(m => m.income.filter(i => i.recurring).reduce((s, i) => s + i.val, 0)); label = "Einnahmen"; color = "#3b82f6"; }
+                    else if(mode === 'expenses') { dataPoints = yearData.map(m => m.expenses.filter(i => i.recurring).reduce((s, i) => s + i.val, 0)); label = "Ausgaben"; color = "#ef4444"; }
+
                     if(this.charts.history) this.charts.history.destroy();
                     this.charts.history = new Chart(ctx, {
                         type: 'line',
-                        data: { labels, datasets: [{ label, data: dataPoints, borderColor: color, borderWidth: 5, tension: 0.4, fill: true, backgroundColor: mode === 'wealth' ? 'rgba(37, 99, 235, 0.05)' : 'rgba(16, 185, 129, 0.05)', pointRadius: 4, pointBackgroundColor: color }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { type: 'category' }, y: { display: false } } }
+                        data: { labels, datasets: [{ label, data: dataPoints, borderColor: color, borderWidth: 5, tension: 0.4, fill: true, backgroundColor: color + '11', pointRadius: 4, pointBackgroundColor: color }] },
+                        options: { 
+                            responsive: true, maintainAspectRatio: false, 
+                            plugins: { legend: { display: false } }, 
+                            scales: { 
+                                x: { type: 'category' }, 
+                                y: { display: false, beginAtZero: false } 
+                            } 
+                        }
                     });
                 }
                 const canvasComp = document.getElementById('chart-comparison');
                 if(canvasComp) {
                     const ctx = canvasComp.getContext('2d');
                     if(this.charts.comparison) this.charts.comparison.destroy();
-                    this.charts.comparison = new Chart(ctx, { type: 'doughnut', data: { labels: ['Spend', 'Invest', 'Rest'], datasets: [{ data: [totalExp, totalInv, Math.max(0, totalInc - totalExp - totalInv)], backgroundColor: ['#ef4444', '#10b981', '#3b82f6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '82%' } });
+                    this.charts.comparison = new Chart(ctx, { 
+                        type: 'doughnut', 
+                        data: { labels: ['Spend', 'Invest', 'Rest'], datasets: [{ data: [totalExp, totalInv, Math.max(0, totalInc - totalExp - totalInv)], backgroundColor: ['#ef4444', '#10b981', '#3b82f6'], borderWidth: 0 }] }, 
+                        options: { responsive: true, maintainAspectRatio: false, cutout: '82%' } 
+                    });
                 }
             },
 
@@ -799,20 +800,11 @@
             hideCopyModal() { document.getElementById('copy-modal').classList.add('hidden'); },
             showSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); },
             hideSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); },
-            executeCopy() {
-                const sYear = document.getElementById('copy-year').value;
-                const sMonth = document.getElementById('copy-month').value;
-                if (this.state.db[sYear] && this.state.db[sYear][sMonth]) { this.state.db[this.state.year][this.state.month] = JSON.parse(JSON.stringify(this.state.db[sYear][sMonth])); this.render(); this.hideCopyModal(); }
-            },
-            changeDate() { /* Internal placeholder */ },
+            executeCopy() { const sYear = document.getElementById('copy-year').value; const sMonth = document.getElementById('copy-month').value; if (this.state.db[sYear] && this.state.db[sYear][sMonth]) { this.state.db[this.state.year][this.state.month] = JSON.parse(JSON.stringify(this.state.db[sYear][sMonth])); this.render(); this.hideCopyModal(); } },
             toggleTheme() { this.state.theme = this.state.theme === 'light' ? 'dark' : 'light'; this.applyTheme(); this.save(); },
             applyTheme() { document.body.className = this.state.theme; },
             save() { localStorage.setItem('lw_tactical_v13', JSON.stringify(this.state)); },
-            export() {
-                const blob = new Blob([JSON.stringify(this.state)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url; a.download = `lw_backup_${this.state.year}.json`; a.click();
-            },
+            export() { const blob = new Blob([JSON.stringify(this.state)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `lw_backup_${this.state.year}.json`; a.click(); },
             format(v) { return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v); }
         };
         window.onload = () => app.init();
