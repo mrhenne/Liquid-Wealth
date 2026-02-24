@@ -95,12 +95,44 @@
             50% { border-color: var(--accent); }
         }
 
-        /* High Contrast for Navbar */
         #nav-main {
             position: sticky;
             top: 0;
             z-index: 100;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .ai-glow {
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
+        }
+
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        /* Collapsible utilities */
+        .collapse-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .collapse-content.open {
+            max-height: 2000px;
+        }
+        .chevron {
+            transition: transform 0.3s ease;
+        }
+        .chevron.rotated {
+            transform: rotate(180deg);
         }
     </style>
 </head>
@@ -118,6 +150,7 @@
             </div>
             
             <div class="flex items-center gap-3 bg-slate-100 dark:bg-slate-800 p-2 rounded-lg border-2 border-slate-200 dark:border-slate-700">
+                <button onclick="app.showCopyModal()" class="text-[10px] font-black bg-emerald-600 text-white px-2 py-1 rounded">DATEN ÜBERNEHMEN</button>
                 <select id="ui-year" onchange="app.changeDate()" class="text-sm"></select>
                 <select id="ui-month" onchange="app.changeDate()" class="text-sm">
                     <option value="0">JANUAR</option><option value="1">FEBRUAR</option>
@@ -135,93 +168,139 @@
     <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
         
         <!-- Top KPIs -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="tactical-card border-l-8 border-black dark:border-white breathe">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="tactical-card border-l-8 border-black dark:border-white breathe p-4">
                 <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Net Worth</p>
-                <h2 id="kpi-wealth" class="text-4xl font-black tabular-nums">0 €</h2>
-                <p id="kpi-btc" class="text-[10px] font-bold text-orange-500 mt-1 uppercase tracking-tighter">₿ 0.00000000 BTC</p>
+                <h2 id="kpi-wealth" class="text-2xl font-black tabular-nums">0 €</h2>
+                <p id="kpi-btc" class="text-[9px] font-bold text-orange-500 mt-1 uppercase tracking-tighter">₿ 0 BTC</p>
             </div>
-            <div class="tactical-card border-l-8 border-blue-600">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Monats-Cashflow</p>
-                <h2 id="kpi-cashflow" class="text-4xl font-black tabular-nums">0 €</h2>
-                <div id="kpi-savings" class="text-[10px] font-bold text-blue-600 mt-1 uppercase">Quote: 0%</div>
+            <div class="tactical-card border-l-8 border-blue-600 p-4">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Cashflow</p>
+                <h2 id="kpi-cashflow" class="text-2xl font-black tabular-nums">0 €</h2>
+                <div id="kpi-savings" class="text-[9px] font-bold text-blue-600 mt-1 uppercase">Quote: 0%</div>
             </div>
-            <div class="tactical-card border-l-8 border-emerald-500">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Finanzielle Freiheit</p>
-                <h2 id="kpi-fire" class="text-4xl font-black tabular-nums">-- J.</h2>
+            <div class="tactical-card border-l-8 border-red-500 p-4">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Restbudget</p>
+                <h2 id="kpi-remaining" class="text-2xl font-black tabular-nums">0 €</h2>
+                <p class="text-[9px] font-bold opacity-40 mt-1 uppercase">Freies Kapital</p>
+            </div>
+            <div class="tactical-card border-l-8 border-emerald-500 p-4">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">FIRE Roadmap</p>
+                <h2 id="kpi-fire" class="text-2xl font-black tabular-nums">-- J.</h2>
                 <div class="w-full bg-slate-200 dark:bg-slate-800 h-1 mt-2">
                     <div id="fire-progress" class="bg-emerald-500 h-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
-            <div class="tactical-card border-l-8 border-red-500">
-                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Financial Runway</p>
-                <h2 id="kpi-runway" class="text-4xl font-black tabular-nums">0 M.</h2>
-                <p class="text-[10px] font-bold opacity-40 mt-1 uppercase">Ohne Einkommen</p>
+            <div class="tactical-card border-l-8 border-purple-500 p-4">
+                <p class="text-[10px] font-black opacity-60 uppercase tracking-widest">Runway</p>
+                <h2 id="kpi-runway" class="text-2xl font-black tabular-nums">0 M.</h2>
+                <p class="text-[9px] font-bold opacity-40 mt-1 uppercase">Sicherheit</p>
             </div>
         </div>
 
-        <!-- Main Workspace -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- AI Assistant -->
+        <div class="tactical-card ai-glow bg-blue-50 dark:bg-blue-900/10">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                <div>
+                    <h3 class="text-xl font-black uppercase flex items-center gap-2">✨ Gemini Strategie-Zentrum</h3>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="app.askAI('analyze')" class="btn-action text-[10px] py-1 px-3">✨ Lage-Check</button>
+                    <button onclick="app.askAI('tips')" class="btn-action bg-emerald-600 text-[10px] py-1 px-3">✨ Spar-Tipps</button>
+                </div>
+            </div>
+            <div id="ai-response" class="bg-white dark:bg-slate-900 p-3 rounded border-2 border-slate-200 dark:border-slate-800 text-sm leading-relaxed overflow-y-auto max-h-[150px]">Bereit für die Analyse...</div>
+        </div>
+
+        <!-- Main Workspace (Collapsible Columns) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
             
             <!-- INCOME -->
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-black uppercase">Einnahmen</h3>
-                    <button onclick="app.add('income')" class="w-8 h-8 bg-black dark:bg-white text-white dark:text-black font-black rounded-full">+</button>
+            <div class="tactical-card p-0 overflow-hidden">
+                <div onclick="app.toggleCollapse('col-income', 'chevron-income')" class="p-4 bg-slate-200 dark:bg-slate-800 cursor-pointer flex justify-between items-center border-b-2 border-slate-300 dark:border-slate-700">
+                    <h3 class="text-sm font-black uppercase">Einnahmen</h3>
+                    <div class="flex items-center gap-3">
+                        <button onclick="event.stopPropagation(); app.add('income')" class="w-6 h-6 bg-black dark:bg-white text-white dark:text-black font-black rounded-full text-xs">+</button>
+                        <svg id="chevron-income" class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
                 </div>
-                <div class="flex flex-wrap gap-2 mb-2">
-                    <span class="suggestion-chip" onclick="app.quickAdd('income', 'Gehalt Helios', 3200)">Gehalt Helios</span>
-                    <span class="suggestion-chip" onclick="app.quickAdd('income', 'Testsieger-TV', 450)">Testsieger-TV</span>
-                    <span class="suggestion-chip" onclick="app.quickAdd('income', 'Krypto Staking', 50)">Staking</span>
+                <div id="col-income" class="collapse-content open p-4">
+                    <div class="flex flex-wrap gap-1 mb-3">
+                        <span class="suggestion-chip" onclick="app.quickAdd('income', 'Gehalt Helios', 3200)">Helios</span>
+                        <span class="suggestion-chip" onclick="app.quickAdd('income', 'Testsieger-TV', 450)">Redaktion</span>
+                    </div>
+                    <div id="list-income" class="space-y-2"></div>
                 </div>
-                <div id="list-income" class="space-y-2"></div>
             </div>
 
             <!-- EXPENSES -->
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-black uppercase text-red-600">Ausgaben</h3>
-                    <button onclick="app.add('expenses')" class="w-8 h-8 bg-red-600 text-white font-black rounded-full">+</button>
+            <div class="tactical-card p-0 overflow-hidden">
+                <div onclick="app.toggleCollapse('col-expenses', 'chevron-expenses')" class="p-4 bg-red-100 dark:bg-red-950/30 cursor-pointer flex justify-between items-center border-b-2 border-red-200 dark:border-red-900/50">
+                    <h3 class="text-sm font-black uppercase text-red-600">Ausgaben</h3>
+                    <div class="flex items-center gap-3">
+                        <button onclick="event.stopPropagation(); app.add('expenses')" class="w-6 h-6 bg-red-600 text-white font-black rounded-full text-xs">+</button>
+                        <svg id="chevron-expenses" class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
                 </div>
-                <div class="flex flex-wrap gap-2 mb-2">
-                    <span class="suggestion-chip" onclick="app.quickAdd('expenses', 'Miete/Wohnen', 900)">Miete</span>
-                    <span class="suggestion-chip" onclick="app.quickAdd('expenses', 'Krypto Nachkauf', 500)">BTC DCA</span>
-                    <span class="suggestion-chip" onclick="app.quickAdd('expenses', 'Streaming Abos', 45)">Abos</span>
+                <div id="col-expenses" class="collapse-content open p-4">
+                    <div class="flex flex-wrap gap-1 mb-3">
+                        <span class="suggestion-chip" onclick="app.quickAdd('expenses', 'Miete', 900)">Miete</span>
+                        <span class="suggestion-chip" onclick="app.quickAdd('expenses', 'Essen', 400)">Food</span>
+                    </div>
+                    <div id="list-expenses" class="space-y-2"></div>
                 </div>
-                <div id="list-expenses" class="space-y-2"></div>
+            </div>
+
+            <!-- INVESTMENTS (New) -->
+            <div class="tactical-card p-0 overflow-hidden">
+                <div onclick="app.toggleCollapse('col-invest', 'chevron-invest')" class="p-4 bg-emerald-100 dark:bg-emerald-950/30 cursor-pointer flex justify-between items-center border-b-2 border-emerald-200 dark:border-emerald-900/50">
+                    <h3 class="text-sm font-black uppercase text-emerald-600">Investments</h3>
+                    <div class="flex items-center gap-3">
+                        <button onclick="event.stopPropagation(); app.add('invest')" class="w-6 h-6 bg-emerald-600 text-white font-black rounded-full text-xs">+</button>
+                        <svg id="chevron-invest" class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+                <div id="col-invest" class="collapse-content open p-4">
+                    <div class="flex flex-wrap gap-1 mb-3">
+                        <span class="suggestion-chip" onclick="app.quickAdd('invest', 'BTC DCA', 500)">Bitcoin</span>
+                        <span class="suggestion-chip" onclick="app.quickAdd('invest', 'Welt ETF', 1000)">ETF</span>
+                    </div>
+                    <div id="list-invest" class="space-y-2"></div>
+                </div>
             </div>
 
             <!-- ASSETS -->
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-black uppercase text-blue-600">Assets</h3>
-                    <button onclick="app.add('assets')" class="w-8 h-8 bg-blue-600 text-white font-black rounded-full">+</button>
+            <div class="tactical-card p-0 overflow-hidden">
+                <div onclick="app.toggleCollapse('col-assets', 'chevron-assets')" class="p-4 bg-blue-100 dark:bg-blue-950/30 cursor-pointer flex justify-between items-center border-b-2 border-blue-200 dark:border-blue-900/50">
+                    <h3 class="text-sm font-black uppercase text-blue-600">Bestand (Assets)</h3>
+                    <div class="flex items-center gap-3">
+                        <button onclick="event.stopPropagation(); app.add('assets')" class="w-6 h-6 bg-blue-600 text-white font-black rounded-full text-xs">+</button>
+                        <svg id="chevron-assets" class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
                 </div>
-                <div class="flex flex-wrap gap-2 mb-2">
-                    <span class="suggestion-chip" onclick="app.quickAdd('assets', 'Bitcoin Cold Storage', 50000)">Bitcoin</span>
-                    <span class="suggestion-chip" onclick="app.quickAdd('assets', 'Welt ETF Portfolio', 12000)">ETF</span>
-                    <span class="suggestion-chip" onclick="app.quickAdd('assets', 'Notgroschen', 5000)">Cash</span>
+                <div id="col-assets" class="collapse-content open p-4">
+                    <div class="flex flex-wrap gap-1 mb-3">
+                        <span class="suggestion-chip" onclick="app.quickAdd('assets', 'Cold Storage', 60000)">BTC</span>
+                        <span class="suggestion-chip" onclick="app.quickAdd('assets', 'Tagesgeld', 5000)">Cash</span>
+                    </div>
+                    <div id="list-assets" class="space-y-2"></div>
                 </div>
-                <div id="list-assets" class="space-y-2"></div>
             </div>
         </div>
 
-        <!-- Charts & Simulation -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8 tactical-card">
-                <h3 class="text-lg font-black uppercase mb-6">Net Worth Timeline</h3>
-                <div class="h-[300px]">
-                    <canvas id="chart-history"></canvas>
-                </div>
+                <h3 class="text-sm font-black uppercase mb-4">Vermögensverlauf</h3>
+                <div class="h-[300px]"><canvas id="chart-history"></canvas></div>
             </div>
             <div class="lg:col-span-4 tactical-card space-y-6">
-                <h3 class="text-lg font-black uppercase mb-4">Einstellungen</h3>
+                <h3 class="text-sm font-black uppercase mb-4">Setup</h3>
                 <div>
-                    <label class="text-[10px] font-black uppercase opacity-60">BTC Kurs (€)</label>
+                    <label class="text-[10px] font-black uppercase opacity-60">Bitcoin Kurs (€)</label>
                     <input type="number" id="cfg-btc" value="95000" onchange="app.render()" class="w-full mt-1">
                 </div>
                 <div>
-                    <label class="text-[10px] font-black uppercase opacity-60">Ziel-Vermögen (€)</label>
+                    <label class="text-[10px] font-black uppercase opacity-60">FIRE Ziel (€)</label>
                     <input type="number" id="cfg-target" value="1000000" onchange="app.render()" class="w-full mt-1">
                 </div>
                 <div>
@@ -231,16 +310,35 @@
                         <span id="ui-roi" class="font-black text-blue-600">7%</span>
                     </div>
                 </div>
-                <button onclick="app.export()" class="w-full bg-slate-900 text-white dark:bg-white dark:text-black py-3 rounded font-black text-xs uppercase">Daten sichern (JSON)</button>
+                <button onclick="app.export()" class="w-full bg-black text-white dark:bg-white dark:text-black py-3 rounded font-black text-xs uppercase">Backup Export</button>
             </div>
         </div>
-
     </main>
 
+    <!-- Copy Modal -->
+    <div id="copy-modal" class="fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4 hidden">
+        <div class="tactical-card max-w-sm w-full bg-white dark:bg-slate-900">
+            <h3 class="text-lg font-black uppercase mb-4">Daten Übernehmen</h3>
+            <p class="text-xs font-bold mb-4 opacity-60">Kopiere Struktur und Werte aus einem anderen Monat in den aktuell gewählten.</p>
+            <div class="space-y-4">
+                <select id="copy-year" class="w-full"></select>
+                <select id="copy-month" class="w-full">
+                    <option value="0">JANUAR</option><option value="1">FEBRUAR</option>
+                    <option value="2">MÄRZ</option><option value="3">APRIL</option>
+                    <option value="4">MAI</option><option value="5">JUNI</option>
+                    <option value="6">JULI</option><option value="7">AUGUST</option>
+                    <option value="8">SEPTEMBER</option><option value="9">OKTOBER</option>
+                    <option value="10">NOVEMBER</option><option value="11">DEZEMBER</option>
+                </select>
+                <div class="flex gap-2">
+                    <button onclick="app.hideCopyModal()" class="flex-1 py-2 font-black uppercase text-xs">Abbruch</button>
+                    <button onclick="app.executeCopy()" class="flex-1 py-2 bg-emerald-600 text-white font-black uppercase text-xs">Kopieren</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        /**
-         * LIQUID WEALTH TACTICAL CORE
-         */
         const app = {
             state: {
                 year: 2025,
@@ -251,16 +349,18 @@
             chart: null,
 
             init() {
-                const saved = localStorage.getItem('lw_tactical_v7');
+                const saved = localStorage.getItem('lw_tactical_v8');
                 if (saved) this.state = JSON.parse(saved);
 
-                // Year Selector
                 const yp = document.getElementById('ui-year');
-                for(let i=2024; i<=2030; i++) {
-                    const opt = document.createElement('option');
-                    opt.value = i; opt.innerText = i;
-                    if(i === this.state.year) opt.selected = true;
-                    yp.appendChild(opt);
+                const cy = document.getElementById('copy-year');
+                for(let i=2024; i<=2035; i++) {
+                    [yp, cy].forEach(el => {
+                        const opt = document.createElement('option');
+                        opt.value = i; opt.innerText = i;
+                        if(i === this.state.year) opt.selected = true;
+                        el.appendChild(opt);
+                    });
                 }
                 document.getElementById('ui-month').value = this.state.month;
 
@@ -273,16 +373,18 @@
                 const y = this.state.year.toString();
                 if(!this.state.db[y]) {
                     this.state.db[y] = Array(12).fill(null).map(() => ({
-                        income: [], expenses: [], assets: []
+                        income: [], expenses: [], assets: [], invest: []
                     }));
                 }
             },
 
             render() {
                 const data = this.state.db[this.state.year][this.state.month];
+                if (!data.invest) data.invest = []; // Legacy fix
                 
                 this.renderList('income', data.income);
                 this.renderList('expenses', data.expenses);
+                this.renderList('invest', data.invest);
                 this.renderList('assets', data.assets);
 
                 this.calc();
@@ -295,14 +397,19 @@
                 container.innerHTML = '';
                 items.forEach((item, idx) => {
                     const div = document.createElement('div');
-                    div.className = "flex gap-2 items-center mb-2";
+                    div.className = "flex gap-2 items-center";
                     div.innerHTML = `
-                        <input type="text" value="${item.name}" onchange="app.updateItem('${type}', ${idx}, 'name', this.value)" class="flex-1 text-sm">
-                        <input type="number" value="${item.val}" onchange="app.updateItem('${type}', ${idx}, 'val', this.value)" class="w-24 text-right text-sm">
-                        <button onclick="app.remove('${type}', ${idx})" class="text-red-500 font-bold px-2">✕</button>
+                        <input type="text" value="${item.name}" onchange="app.updateItem('${type}', ${idx}, 'name', this.value)" class="flex-1 text-[11px] p-2">
+                        <input type="number" value="${item.val}" onchange="app.updateItem('${type}', ${idx}, 'val', this.value)" class="w-20 text-right text-[11px] p-2">
+                        <button onclick="app.remove('${type}', ${idx})" class="text-red-500 font-bold px-1">✕</button>
                     `;
                     container.appendChild(div);
                 });
+            },
+
+            toggleCollapse(id, chevronId) {
+                document.getElementById(id).classList.toggle('open');
+                document.getElementById(chevronId).classList.toggle('rotated');
             },
 
             updateItem(type, idx, field, val) {
@@ -333,28 +440,34 @@
                 const data = this.state.db[this.state.year][this.state.month];
                 const inc = data.income.reduce((s, i) => s + i.val, 0);
                 const exp = data.expenses.reduce((s, i) => s + i.val, 0);
+                const inv = (data.invest || []).reduce((s, i) => s + i.val, 0);
                 const wealth = data.assets.reduce((s, i) => s + i.val, 0);
+                
                 const btcPrice = parseFloat(document.getElementById('cfg-btc').value) || 1;
                 const roi = parseFloat(document.getElementById('cfg-roi').value);
                 const target = parseFloat(document.getElementById('cfg-target').value);
 
                 document.getElementById('ui-roi').innerText = roi + '%';
                 document.getElementById('kpi-wealth').innerText = this.format(wealth);
-                document.getElementById('kpi-btc').innerText = `₿ ${(wealth / btcPrice).toFixed(8)} BTC`;
+                document.getElementById('kpi-btc').innerText = `₿ ${(wealth / btcPrice).toFixed(6)} BTC`;
                 document.getElementById('kpi-cashflow').innerText = this.format(inc - exp);
                 
-                const rate = inc > 0 ? Math.round(((inc - exp) / inc) * 100) : 0;
+                // Restbudget: Einnahmen - Ausgaben - Investments
+                const remaining = inc - exp - inv;
+                const remEl = document.getElementById('kpi-remaining');
+                remEl.innerText = this.format(remaining);
+                remEl.style.color = remaining < 0 ? '#ef4444' : (remaining > 0 ? '#10b981' : 'inherit');
+                
+                const rate = inc > 0 ? Math.round(((inv) / inc) * 100) : 0;
                 document.getElementById('kpi-savings').innerText = `Quote: ${rate}%`;
 
-                // Runway
                 const runway = exp > 0 ? Math.floor(wealth / exp) : 0;
                 document.getElementById('kpi-runway').innerText = runway + " M.";
 
-                // FIRE
                 if(wealth >= target) {
                     document.getElementById('kpi-fire').innerText = "JETZT";
                 } else {
-                    const monthlySave = inc - exp;
+                    const monthlySave = inv + Math.max(0, remaining); // Wir nehmen an, das Restbudget wird auch investiert
                     if(monthlySave <= 0) {
                         document.getElementById('kpi-fire').innerText = "∞ J.";
                     } else {
@@ -403,6 +516,23 @@
                 });
             },
 
+            showCopyModal() { document.getElementById('copy-modal').classList.remove('hidden'); },
+            hideCopyModal() { document.getElementById('copy-modal').classList.add('hidden'); },
+            
+            executeCopy() {
+                const sYear = document.getElementById('copy-year').value;
+                const sMonth = document.getElementById('copy-month').value;
+                
+                if (this.state.db[sYear] && this.state.db[sYear][sMonth]) {
+                    const source = JSON.parse(JSON.stringify(this.state.db[sYear][sMonth]));
+                    this.state.db[this.state.year][this.state.month] = source;
+                    this.render();
+                    this.hideCopyModal();
+                } else {
+                    alert("Keine Daten im Quell-Monat gefunden!");
+                }
+            },
+
             changeDate() {
                 this.state.year = parseInt(document.getElementById('ui-year').value);
                 this.state.month = parseInt(document.getElementById('ui-month').value);
@@ -416,14 +546,8 @@
                 this.save();
             },
 
-            applyTheme() {
-                document.body.className = this.state.theme;
-            },
-
-            save() {
-                localStorage.setItem('lw_tactical_v7', JSON.stringify(this.state));
-            },
-
+            applyTheme() { document.body.className = this.state.theme; },
+            save() { localStorage.setItem('lw_tactical_v8', JSON.stringify(this.state)); },
             export() {
                 const blob = new Blob([JSON.stringify(this.state)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -433,11 +557,54 @@
                 a.click();
             },
 
-            format(v) {
-                return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v);
+            format(v) { return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v); },
+
+            async askAI(mode) {
+                const aiDisplay = document.getElementById('ai-response');
+                aiDisplay.innerHTML = '<span class="loading-dots font-bold">Analysiere Finanzlage</span>';
+                
+                const data = this.state.db[this.state.year][this.state.month];
+                const inc = data.income.reduce((s, i) => s + i.val, 0);
+                const exp = data.expenses.reduce((s, i) => s + i.val, 0);
+                const inv = (data.invest || []).reduce((s, i) => s + i.val, 0);
+                const wealth = data.assets.reduce((s, i) => s + i.val, 0);
+                const remaining = inc - exp - inv;
+                
+                let prompt = "";
+                if (mode === 'analyze') {
+                    prompt = `Analysiere meine finanzielle Lage basierend auf diesen Daten: 
+                    Net Worth: ${wealth}€, Einkommen: ${inc}€, Ausgaben: ${exp}€, Investments: ${inv}€, Restbudget: ${remaining}€. 
+                    Gib eine kurze, taktische Einschätzung (max 3-4 Sätze) und einen Financial Health Score (0-100).`;
+                } else {
+                    prompt = `Einkommen ${inc}€, Ausgaben ${exp}€, Investments ${inv}€. Restbudget am Monatsende: ${remaining}€. 
+                    Nenne mir 3 unkonventionelle Strategien um das Restbudget effektiver zu nutzen oder die Sparrate zu erhöhen.`;
+                }
+
+                const responseText = await this.callGemini(prompt);
+                aiDisplay.innerHTML = responseText || "KI nicht erreichbar.";
+            },
+
+            async callGemini(prompt) {
+                const apiKey = ""; 
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: "Du bist ein erfahrener Finanz-Strategie-Berater. Gib kurze, prägnante Antworten in Deutsch." }] }
+                };
+                let retries = 5; let delay = 1000;
+                while (retries > 0) {
+                    try {
+                        const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                        if (!response.ok) throw new Error("API Fehler");
+                        const result = await response.json();
+                        return result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    } catch (error) {
+                        retries--; if (retries === 0) return null;
+                        await new Promise(res => setTimeout(res, delay)); delay *= 2;
+                    }
+                }
             }
         };
-
         window.onload = () => app.init();
     </script>
 </body>
