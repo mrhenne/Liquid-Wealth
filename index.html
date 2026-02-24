@@ -801,16 +801,31 @@
             toggleRecurring(t, i) { this.state.db[this.state.year][this.state.month][t][i].recurring = !this.state.db[this.state.year][this.state.month][t][i].recurring; this.render(); },
             add(t) { this.state.db[this.state.year][this.state.month][t].push({name:'Neu...',val:0,recurring:true}); this.render(); },
             remove(t, i) { this.state.db[this.state.year][this.state.month][t].splice(i, 1); this.render(); },
+            
             syncCategoryFromPrev(t) {
-                const cm = this.state.month; const pm = cm === 0 ? 11 : cm-1; const py = cm === 0 ? this.state.year-1 : this.state.year;
+                const cm = this.state.month; 
+                const pm = cm === 0 ? 11 : cm-1; 
+                const py = cm === 0 ? this.state.year-1 : this.state.year;
+                
                 if(!this.state.db[py] || !this.state.db[py][pm]) return;
-                const source = this.state.db[py][pm][t]; const target = this.state.db[this.state.year][this.state.month][t];
+                
+                const source = this.state.db[py][pm][t]; 
+                const target = this.state.db[this.state.year][this.state.month][t];
+                
                 source.forEach(s => {
                     const exists = target.find(x => x.name === s.name);
-                    if(exists) exists.val = s.val; else target.push(JSON.parse(JSON.stringify(s)));
+                    if (exists) {
+                        // Nur überschreiben, wenn der aktuelle Wert 0 ist (verhindert Datenverlust)
+                        if (exists.val === 0) exists.val = s.val;
+                        exists.recurring = s.recurring;
+                    } else {
+                        // Wenn der Posten noch gar nicht existiert, neu hinzufügen
+                        target.push(JSON.parse(JSON.stringify(s)));
+                    }
                 });
                 this.render();
             },
+            
             syncRecurring() { ['income','expenses','invest','assets'].forEach(t => this.syncCategoryFromPrev(t)); },
             showSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); },
             hideSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); },
